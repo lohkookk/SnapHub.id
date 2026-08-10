@@ -83,16 +83,7 @@ const Hero = () => {
       <div className="relative z-10 w-full flex flex-col items-center text-center px-5 sm:px-8   max-w-5xl mx-auto pt-28 pb-20">
 
         {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, duration: 0.6 }}
-          className="inline-flex items-center gap-3 glass border border-[#D90429]/35 rounded-2xl text-xs sm:text-sm text-[#D90429] font-medium mb-1624 select-none whitespace-nowrap"
-          style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', paddingLeft: '1.25rem', paddingRight: '1.5rem' }}
-        >
-          <span className="w-2.5 h-2.5 rounded-full bg-[#D90429] animate-pulse flex-shrink-0" />
-          <span className="tracking-wider">Premium Photobooth Services</span>
-        </motion.div>
+
 
         {/* H1 */}
         <motion.h1
@@ -122,11 +113,10 @@ const Hero = () => {
           initial={{ opacity: 0, y: 22 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.7 }}
-          className="text-sm md:text-[18px] text-gray-300 max-w-xl mx-auto mb-10 leading-[1.85]"
+          className="text-sm md:text-[20px] text-gray-300 max-w-xl mx-auto mb-10 leading-[1.85]"
           style={{ paddingBottom: "10px" }}
         >
-          Premium Photobooth Services for Every Special Occasion —
-          luxury experience, instant memories, unforgettable moments.
+          Snap It. Share It. SnapHub.
         </motion.p>
 
         {/* Buttons */}

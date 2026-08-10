@@ -11,7 +11,7 @@ const WaIcon = ({ size = 14 }) => (
 );
 
 const INFO = [
-  { icon: <FiMapPin size={14} />,  label: 'Address',   value: 'Jl. Pemuda No. 45, Jakarta Pusat' },
+  { icon: <FiMapPin size={14} />,  label: 'Address',   value: 'Malang, Indonesia' },
   { icon: <FiPhone size={14} />,   label: 'Phone',     value: '+62 851-9064-3459', href: 'tel:+6285190643459' },
   { icon: <WaIcon />,              label: 'WhatsApp',  value: '+62 851-9064-3459', href: WA_URL },
   { icon: <FiInstagram size={14} />, label: 'Instagram', value: '@snaphub.id', href: 'https://instagram.com/snaphub.id' },
