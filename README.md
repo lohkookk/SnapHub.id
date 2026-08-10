@@ -1,16 +1,97 @@
-# React + Vite
+<div align="center">
+  <img src="public/favicon.ico" alt="SnapHub Logo" width="80" height="80" />
+  
+  # SnapHub.id
+  **Premium Photobooth Services in Malang, Indonesia**
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+  <p>
+    <a href="https://snaphub-akasha.vercel.app">View Live Demo</a> ·
+    <a href="https://wa.me/6285190643459">Contact Us</a>
+  </p>
+</div>
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 📸 About The Project
 
-## React Compiler
+SnapHub is a modern, fast, and responsive web application built for a premium photobooth service based in Malang. Designed with a sleek "dark-glassmorphism" aesthetic, it provides users with an engaging experience to explore features, view dynamic pricing, download price guides, and calculate revenue sharing for partnership events.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🌟 Key Features
 
-## Expanding the Oxlint configuration
+- **Modern UI/UX:** Built with a dark mode glassmorphism design, vibrant gradients, and smooth micro-animations.
+- **Dynamic Profit Calculator:** A dedicated revenue-sharing calculator for "Event Fun Snap" partners, featuring interactive charts (Recharts) to visualize revenue distribution.
+- **Pricelist & PDF Integration:** Clear pricing structures with direct access to download the official PDF Price Guide.
+- **Smooth Navigation:** Single-page application feeling with smooth scrolling anchor links.
+- **Floating WhatsApp:** Persistent quick-access floating button for seamless customer communication.
+- **Interactive Maps:** Embedded Google Maps pinpointing the Malang location.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## 🛠 Built With
+
+This project is built using modern web development tools:
+
+- [React.js](https://reactjs.org/)
+- [Vite](https://vitejs.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Framer Motion](https://www.framer.com/motion/) (Animations)
+- [Recharts](https://recharts.org/) (Data Visualization)
+- [React Icons](https://react-icons.github.io/react-icons/)
+- [React Scroll](https://www.npmjs.com/package/react-scroll)
+
+## 🚀 Getting Started
+
+Follow these instructions to set up the project locally on your machine.
+
+### Prerequisites
+
+- Node.js (v16.x or higher recommended)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/lohkookk/SnapHub.id.git
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd SnapHub.id
+   ```
+3. Install the dependencies:
+   ```bash
+   npm install
+   ```
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+5. Open your browser and visit `http://localhost:5173`.
+
+## 📁 Project Structure
+
+```text
+src/
+├── assets/         # Static assets (images, fonts)
+├── components/     # Reusable React components (Navbar, Hero, Footer, etc.)
+├── pages/          # Main page assemblies (Home.jsx)
+├── index.css       # Global CSS and Tailwind configurations
+├── App.jsx         # Main application layout and routing
+└── main.jsx        # Entry point
+public/
+└── PriceGuideSnapHub.id.pdf  # Downloadable price guide
+```
+
+## 🌐 Deployment
+
+This project is optimized for deployment on [Vercel](https://vercel.com). Because it uses Vite, the build command is `npm run build` and the output directory is `dist`.
+
+Live Deployment URL: [snaphub-akasha.vercel.app](https://snaphub-akasha.vercel.app)
+
+## 📞 Contact
+
+**SnapHub.id**
+- Location: Malang, Jawa Timur, Indonesia
+- WhatsApp: [+62 851-9064-3459](https://wa.me/6285190643459)
+- Instagram: [@snaphub.id](https://instagram.com/snaphub.id)
+
+---
+*Made with ♥ by Puja Rajistha.*
