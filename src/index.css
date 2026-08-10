@@ -1,0 +1,505 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* ========================================
+   GLOBAL RESET & BASE
+   ======================================== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+  font-size: 16px;
+}
+
+body {
+  background-color: #0B0B0B;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+}
+
+/* ========================================
+   CUSTOM SCROLLBAR
+   ======================================== */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0B0B;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D90429;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A50320;
+}
+
+/* ========================================
+   TYPOGRAPHY SYSTEM
+   ======================================== */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+p,
+span,
+a,
+li,
+label,
+input,
+button {
+  font-family: 'Inter', sans-serif;
+}
+
+.font-heading {
+  font-family: 'Poppins', sans-serif;
+}
+
+.font-body {
+  font-family: 'Inter', sans-serif;
+}
+
+.text-hero {
+  font-size: clamp(2.75rem, 8vw, 5.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.text-section-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.text-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #D90429;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ========================================
+   COLOR & BRAND TOKENS
+   ======================================== */
+:root {
+  --c-black: #0B0B0B;
+  --c-dark: #111111;
+  --c-surface: #171717;
+  --c-card: #1c1c1c;
+  --c-red: #D90429;
+  --c-red-dk: #A50320;
+  --c-red-g: rgba(217, 4, 41, 0.25);
+  --c-white: #ffffff;
+  --c-muted: #9ca3af;
+  --c-dim: #6b7280;
+}
+
+/* ========================================
+   GLASSMORPHISM
+   ======================================== */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(217, 4, 41, 0.35);
+  box-shadow: 0 0 35px rgba(217, 4, 41, 0.12), 0 20px 50px rgba(0, 0, 0, 0.4);
+  transform: translateY(-4px);
+}
+
+/* ========================================
+   GLOW EFFECTS
+   ======================================== */
+.glow-red {
+  box-shadow: 0 0 25px rgba(217, 4, 41, 0.45), 0 0 70px rgba(217, 4, 41, 0.12);
+}
+
+.glow-red-sm {
+  box-shadow: 0 0 12px rgba(217, 4, 41, 0.35);
+}
+
+.glow-red-text {
+  text-shadow: 0 0 40px rgba(217, 4, 41, 0.65);
+}
+
+/* ========================================
+   GRADIENT BORDER
+   ======================================== */
+.gradient-border {
+  background: linear-gradient(135deg, rgba(217, 4, 41, 0.6), rgba(255, 255, 255, 0.08), rgba(217, 4, 41, 0.25));
+  padding: 1.5px;
+  border-radius: 20px;
+}
+
+/* ========================================
+   SECTION LAYOUT
+   ======================================== */
+.section-pad {
+  padding: 5rem 0;
+}
+
+@media (min-width: 768px) {
+  .section-pad {
+    padding: 6.5rem 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-pad {
+    padding: 8rem 0;
+  }
+}
+
+/* ── Content wrapper (renamed from .container to avoid Tailwind v4 conflict) ── */
+.wrap {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .wrap {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .wrap {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .wrap {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+/* ── Section header block (always centred) ── */
+.section-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.section-desc {
+  max-width: 36rem;
+  margin-left: auto;
+  margin-right: auto;
+  color: #9ca3af;
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+/* ========================================
+   SECTION DIVIDER
+   ======================================== */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(217, 4, 41, 0.25), transparent);
+}
+
+/* ========================================
+   SECTION EYEBROW ROW
+   ======================================== */
+.eyebrow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 1rem;
+}
+
+.eyebrow-line {
+  width: 40px;
+  height: 2px;
+  background: #D90429;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   BUTTON SYSTEM
+   ======================================== */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #D90429;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.6rem 2rem;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-primary:hover {
+  background: #A50320;
+  box-shadow: 0 0 30px rgba(217, 4, 41, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.85rem 2rem;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.25s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-outline:hover {
+  border-color: rgba(217, 4, 41, 0.5);
+  background: rgba(217, 4, 41, 0.08);
+  transform: translateY(-2px);
+}
+
+.btn-outline:active {
+  transform: scale(0.97);
+}
+
+/* ========================================
+   ANIMATED GRADIENT BG
+   ======================================== */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-gradient {
+  background: linear-gradient(-45deg, #0B0B0B, #180508, #0B0B0B, #150208);
+  background-size: 400% 400%;
+  animation: gradientShift 10s ease infinite;
+}
+
+/* ========================================
+   FLOATING WHATSAPP
+   ======================================== */
+@keyframes wa-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55);
+  }
+
+  70% {
+    box-shadow: 0 0 0 14px rgba(37, 211, 102, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+  }
+}
+
+.wa-pulse {
+  animation: wa-pulse 2.2s infinite;
+}
+
+/* ========================================
+   MOUSE GLOW (inside hero only)
+   ======================================== */
+.hero-mouse-glow {
+  pointer-events: none;
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(217, 4, 41, 0.1) 0%, transparent 65%);
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  transition: left 0.12s ease, top 0.12s ease;
+}
+
+/* ========================================
+   INPUT STYLES
+   ======================================== */
+.calc-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.75rem 1rem 0.75rem 3rem;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.calc-input::-webkit-outer-spin-button,
+.calc-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.calc-input:focus {
+  border-color: rgba(217, 4, 41, 0.55);
+  box-shadow: 0 0 0 3px rgba(217, 4, 41, 0.1);
+}
+
+/* ========================================
+   IMAGE HOVER ZOOM
+   ======================================== */
+.img-hover-zoom {
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.img-hover-zoom img {
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.img-hover-zoom:hover img {
+  transform: scale(1.06);
+}
+
+/* ========================================
+   NAV ACTIVE LINK
+   ======================================== */
+.nav-link {
+  position: relative;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.25s ease;
+  padding-bottom: 2px;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #D90429;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #ffffff;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* ========================================
+   GALLERY LIGHTBOX BACKDROP
+   ======================================== */
+.lightbox-bg {
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(12px);
+}
+
+/* ========================================
+   RECHARTS OVERRIDES
+   ======================================== */
+.recharts-wrapper {
+  font-family: 'Inter', sans-serif;
+}
+
+/* ========================================
+   SELECTION COLOR
+   ======================================== */
+::selection {
+  background: rgba(217, 4, 41, 0.35);
+  color: #ffffff;
+}
+
+/* ========================================
+   FOCUS VISIBLE
+   ======================================== */
+:focus-visible {
+  outline: 2px solid rgba(217, 4, 41, 0.6);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
