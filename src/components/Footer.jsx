@@ -156,7 +156,7 @@ const Footer = () => {
 
 
           <p className="text-gray-500 text-[13px] text-center">
-            &copy; {new Date().getFullYear()} SnapHub.id. All rights reserved.
+            &copy; {new Date().getFullYear()} SnapHub.id. All rights reserved. Made with ♥ by Puja Rajistha.
           </p>
         </div>
 
