@@ -12,12 +12,12 @@ import engagementImg from '../assets/gallery_engagement.png';
 const CATEGORIES = ['All', 'Wedding', 'Graduation', 'Birthday', 'Corporate', 'Family', 'Engagement'];
 
 const GALLERY = [
-  { id: 1, src: weddingImg,    cat: 'Wedding',    title: 'Elegant Wedding',        span: 'row-span-2' },
-  { id: 2, src: graduationImg, cat: 'Graduation', title: 'Graduation Celebration', span: '' },
-  { id: 3, src: birthdayImg,   cat: 'Birthday',   title: 'Birthday Party',         span: '' },
-  { id: 4, src: corporateImg,  cat: 'Corporate',  title: 'Corporate Gala',         span: 'row-span-2' },
-  { id: 5, src: familyImg,     cat: 'Family',     title: 'Family Reunion',         span: '' },
-  { id: 6, src: engagementImg, cat: 'Engagement', title: 'Engagement Session',     span: '' },
+  { id: 1, src: weddingImg,    cat: 'Wedding',    title: 'Elegant Wedding',        alt: 'Sewa photobooth pernikahan elegan SnapHub Jakarta — momen pengantin yang tak terlupakan',        span: 'row-span-2' },
+  { id: 2, src: graduationImg, cat: 'Graduation', title: 'Graduation Celebration', alt: 'Photobooth wisuda SnapHub — abadikan kelulusan dengan cetak foto instan berkualitas tinggi',      span: '' },
+  { id: 3, src: birthdayImg,   cat: 'Birthday',   title: 'Birthday Party',         alt: 'Photobooth ulang tahun SnapHub — booth interaktif dengan props unik untuk pesta yang meriah',    span: '' },
+  { id: 4, src: corporateImg,  cat: 'Corporate',  title: 'Corporate Gala',         alt: 'Photobooth acara korporat SnapHub — solusi profesional untuk gala dinner dan company event',      span: 'row-span-2' },
+  { id: 5, src: familyImg,     cat: 'Family',     title: 'Family Reunion',         alt: 'Photobooth reuni keluarga SnapHub — kenangan indah bersama orang-orang terkasih',               span: '' },
+  { id: 6, src: engagementImg, cat: 'Engagement', title: 'Engagement Session',     alt: 'Photobooth sesi tunangan SnapHub — momen lamaran romantis diabadikan dengan sempurna',           span: '' },
 ];
 
 const Gallery = () => {
@@ -99,7 +99,7 @@ const Gallery = () => {
               >
                 <img
                   src={img.src}
-                  alt={img.title}
+                  alt={img.alt || img.title}
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.07]"
                 />
@@ -139,7 +139,7 @@ const Gallery = () => {
             >
               <img
                 src={filtered[lightbox]?.src}
-                alt={filtered[lightbox]?.title}
+                alt={filtered[lightbox]?.alt || filtered[lightbox]?.title}
                 className="w-full max-h-[78vh] object-contain rounded-2xl mx-auto"
               />
               <div className="mt-4">
