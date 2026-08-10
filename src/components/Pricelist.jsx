@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
-import { FiDownload, FiCheck, FiClock, FiPrinter, FiCamera } from 'react-icons/fi';
+import { FiDownload, FiCheck, FiClock, FiPrinter, FiCamera, FiInfo } from 'react-icons/fi';
+
 import pricelistImg from '../assets/pricelist_image.png';
 
 const WA_URL = 'https://wa.me/6285190643459?text=Halo%20SnapHub%2C%20saya%20ingin%20booking%20photobooth!';
@@ -291,8 +292,8 @@ const Pricelist = () => {
           <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-5 md:p-6">
             <div className="flex items-center gap-3 mb-5">
               <div className="h-px flex-1 bg-white/[0.06]" />
-              <h3 className="text-[10px] font-semibold text-gray-500 uppercase tracking-[0.15em] whitespace-nowrap">
-                Syarat &amp; Ketentuan
+              <h3 className="text-[10px] font-semibold text-gray-500 uppercase tracking-[0.15em] whitespace-nowrap flex items-center gap-1.5">
+                <FiInfo size={10} /> Syarat &amp; Ketentuan
               </h3>
               <div className="h-px flex-1 bg-white/[0.06]" />
             </div>
