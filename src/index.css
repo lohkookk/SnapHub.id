@@ -33,6 +33,7 @@
   --admin-accent: #E79EA7;
   --admin-accent-hover: #D28A94;
   --admin-accent-bg: rgba(231, 158, 167, 0.1);
+  --admin-hero-grad: #2D1B1E;
 }
 
 [data-theme='light'] {
@@ -52,6 +53,7 @@
   --admin-accent: #B86B77;
   --admin-accent-hover: #9E5661;
   --admin-accent-bg: rgba(184, 107, 119, 0.08);
+  --admin-hero-grad: #f8ebec;
 }
 
 /* ========================================

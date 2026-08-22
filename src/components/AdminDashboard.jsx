@@ -238,15 +238,15 @@ const AdminDashboard = () => {
       <div className="space-y-6">
         
         {/* Main Net Profit Card */}
-        <div className="bg-gradient-to-br from-[#2D1B1E] to-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[1.5rem] p-6 md:p-8 shadow-[var(--admin-shadow)] relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#E79EA7]/5 rounded-full blur-[80px] pointer-events-none group-hover:bg-[#E79EA7]/10 transition-colors duration-1000" />
+        <div className="bg-gradient-to-br from-[var(--admin-hero-grad)] to-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[1.5rem] p-6 md:p-8 shadow-[var(--admin-shadow)] relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--admin-accent)] opacity-5 rounded-full blur-[80px] pointer-events-none group-hover:opacity-10 transition-opacity duration-1000" />
           
           <div className="relative z-10">
             <p className="text-[var(--admin-text-muted)] text-[0.95rem] font-semibold tracking-wider uppercase mb-1">Total Laba Bersih</p>
             <h2 className="text-4xl md:text-[3.25rem] font-extrabold text-[var(--admin-accent)] mt-2 leading-tight drop-shadow-md">
               {formatIDR(stats.netProfit)}
             </h2>
-            <p className="text-[#E79EA7]/60 text-sm mt-3 font-medium">Akumulasi dari seluruh event & operasional bisnis</p>
+            <p className="text-[var(--admin-text-subtle)] text-sm mt-3 font-medium">Akumulasi dari seluruh event & operasional bisnis</p>
           </div>
         </div>
 
