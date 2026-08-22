@@ -50,12 +50,6 @@ const AdminSchedule = () => {
   };
 
   const handleDateClick = async (clickedDate) => {
-    const isFinance = financialEvents.some(ev => ev.date && isSameDay(parseISO(ev.date), clickedDate));
-    if (isFinance) {
-      toast.success("Event ini dikelola dari halaman Keuangan.");
-      return;
-    }
-
     const isBooked = bookedDates.some(date => isSameDay(date, clickedDate));
     if (isBooked) {
       // Hapus booking lewat modal
@@ -63,11 +57,18 @@ const AdminSchedule = () => {
       if (itemToDelete) {
         setScheduleToDelete(itemToDelete);
       }
-    } else {
-      // Buka modal untuk isi nama event
-      setSelectedDate(clickedDate);
-      setEventName('');
+      return;
     }
+
+    const isFinance = financialEvents.some(ev => ev.date && isSameDay(parseISO(ev.date), clickedDate));
+    if (isFinance) {
+      toast.success("Event ini dikelola dari halaman Keuangan.");
+      return;
+    }
+
+    // Buka modal untuk isi nama event
+    setSelectedDate(clickedDate);
+    setEventName('');
   };
 
   const confirmBooking = async (e) => {
