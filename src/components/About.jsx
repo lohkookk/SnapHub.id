@@ -49,7 +49,7 @@ const About = () => {
               className="absolute bottom-0 -right-2 sm:-right-6 z-20"
             >
               <div className="glass-card-red px-5 py-4">
-                <div className="text-[1.75rem] font-bold text-[#D90429] font-heading leading-none">500+</div>
+                <div className="text-[1.75rem] font-bold text-[#D90429] font-heading leading-none">10+</div>
                 <div className="text-gray-400 text-xs mt-1 whitespace-nowrap">Successful Events</div>
               </div>
             </motion.div>

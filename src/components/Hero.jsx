@@ -19,8 +19,8 @@ const PARTICLES = Array.from({ length: 26 }, (_, i) => ({
 }));
 
 const STATS = [
-  { num: '500+', label: 'Events Done' },
-  { num: '5K+', label: 'Happy Clients' },
+  { num: '10+', label: 'Events Done' },
+  { num: '1K+', label: 'Happy Clients' },
   { num: '4.9★', label: 'Avg Rating' },
 ];
 
