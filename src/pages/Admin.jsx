@@ -260,6 +260,9 @@ const Admin = () => {
               <span className={theme === 'dark' ? 'text-white' : 'text-gray-700'}>{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
             </span>
           </button>
+          <Link to="/" className="w-full flex items-center justify-center gap-2 bg-[var(--admin-hover-bg)] hover:border-[var(--admin-border)] border border-transparent text-[var(--admin-text-main)] px-4 py-3 rounded-xl transition-all text-sm font-medium group">
+            <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" /> Kembali ke Website
+          </Link>
           <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-[var(--admin-hover-bg)] hover:bg-[var(--admin-accent)] hover:text-white text-[var(--admin-text-main)] px-4 py-3 rounded-xl transition-colors text-sm font-medium">
             <FiLogOut /> Logout
           </button>
