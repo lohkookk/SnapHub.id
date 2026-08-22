@@ -1,7 +1,7 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-scroll';
-import { FiInstagram, FiMail, FiArrowUp, FiMapPin, FiPhone, FiClock } from 'react-icons/fi';
+import { FiInstagram, FiArrowUp, FiMapPin, FiPhone, FiClock } from 'react-icons/fi';
 
 const QUICK_LINKS = [
   { label: 'Home', to: 'home' },
@@ -44,10 +44,18 @@ const SOCIALS = [
 ];
 
 const Footer = () => {
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  const footerRef = useRef(null);
+  const isInView = useInView(footerRef, { margin: "0px" });
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
 
   return (
-    <footer className="bg-[#050505] relative pt-16 pb-8 border-t border-white/[0.04]">
+    <footer ref={footerRef} className="bg-[#050505] relative pt-16 pb-8 border-t border-white/[0.04]">
       {/* ── Ambient Background Elements ──────────────── */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-px bg-gradient-to-r from-transparent via-[#D90429]/40 to-transparent" />
@@ -55,14 +63,27 @@ const Footer = () => {
       </div>
 
       {/* ── Floating Back to Top Button ──────────────── */}
-      <motion.button
-        onClick={scrollToTop}
-        whileHover={{ y: -3, boxShadow: '0 0 20px rgba(217,4,41,0.2)' }}
-        whileTap={{ scale: 0.9 }}
-        className="absolute -top-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-[#111111] border border-white/[0.1] hover:bg-white/[0.05] px-6 py-3 rounded-full text-gray-300 hover:text-white text-[11px] uppercase tracking-[0.2em] font-bold transition-all shadow-xl"
-      >
-        <FiArrowUp size={16} className="text-[#D90429]" /> Back to top
-      </motion.button>
+      <AnimatePresence>
+        {isInView && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.5, y: 20 }}
+            className="fixed bottom-24 right-6 md:bottom-[6.5rem] md:right-6 z-[100]"
+          >
+            <motion.button
+              animate={{ y: [0, -6, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+              whileHover={{ scale: 1.1, boxShadow: '0 0 20px rgba(217,4,41,0.5)' }}
+              whileTap={{ scale: 0.9 }}
+              onClick={scrollToTop}
+              className="flex items-center justify-center w-12 h-12 bg-[#D90429] text-white rounded-full shadow-2xl cursor-pointer"
+            >
+              <FiArrowUp size={22} />
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="wrap relative z-10">
 
@@ -71,13 +92,12 @@ const Footer = () => {
 
           {/* Brand Column */}
           <div className="md:col-span-5 lg:col-span-4 flex flex-col items-center md:items-start text-center md:text-left">
-            <Link to="home" smooth={true} duration={800} className="flex items-center gap-2.5 mb-5 cursor-pointer group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#D90429] to-[#9b031d] flex items-center justify-center shadow-[0_0_20px_rgba(217,4,41,0.4)] group-hover:shadow-[0_0_30px_rgba(217,4,41,0.6)] transition-all">
-                <span className="text-white font-black text-lg font-heading">S</span>
-              </div>
-              <span className="text-white font-bold text-xl font-heading tracking-tight">
-                Snap<span className="text-[#D90429]">Hub</span>
-              </span>
+            <Link to="home" smooth={true} duration={800} className="inline-block mb-5 cursor-pointer opacity-90 hover:opacity-100 transition-opacity">
+              <img
+                src="/icons.svg"
+                alt="SnapHub Logo"
+                className="h-10 w-auto"
+              />
             </Link>
 
             <p className="text-gray-400 text-[15px] leading-relaxed mb-8 max-w-sm">
@@ -94,7 +114,7 @@ const Footer = () => {
                   aria-label={s.label}
                   whileHover={{ y: -3 }}
                   whileTap={{ scale: 0.9 }}
-                  className={`w-11 h-11 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-gray-400 transition-all duration-300 ${s.hoverClass}`}
+                  className={`w-11 h-11 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-gray-400 transition-all duration-300 ${s.hoverClass}`}
                 >
                   {s.icon}
                 </motion.a>
@@ -106,7 +126,7 @@ const Footer = () => {
           <div className="hidden lg:block lg:col-span-1" />
 
           {/* Quick Links */}
-          <div className="md:col-span-3 lg:col-span-3 flex flex-col items-center md:items-start text-center md:text-left">
+          <div className="md:col-span-3 lg:col-span-3 flex flex-col items-center md:items-start text-center md:text-left relative">
             <h4 className="text-white font-semibold text-base mb-6 tracking-wider uppercase font-heading">
               Quick Links
             </h4>
@@ -135,9 +155,9 @@ const Footer = () => {
               Contact Us
             </h4>
             <ul className="flex flex-col gap-4 text-[15px] text-gray-400">
-              <li className="flex items-start gap-3">
-                <FiMapPin className="text-[#D90429] shrink-0 mt-1" size={18} />
-                <span>Malang, Jawa Timur<br />Indonesia</span>
+              <li className="flex items-center gap-3">
+                <FiMapPin className="text-[#D90429] shrink-0" size={18} />
+                <span>Malang, Jawa Timur, Indonesia</span>
               </li>
               <li className="flex items-center gap-3">
                 <FiPhone className="text-[#D90429] shrink-0" size={18} />
@@ -145,18 +165,26 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-3">
                 <FiClock className="text-[#D90429] shrink-0" size={18} />
-                <span>Senin – Minggu (09:00 - 21:00)</span>
+                <span>Senin – Minggu (07:00 - 22:00)</span>
               </li>
             </ul>
           </div>
         </div>
 
         {/* ── Bottom Bar ─────────────────────────────── */}
-        <div className="pt-8 pb-4 border-t border-white/[0.08] flex flex-col items-center justify-center gap-5 mt-6">
+        <div className="pt-8 pb-4 border-t border-white/10 flex flex-col items-center justify-center gap-5 mt-6">
 
 
-          <p className="text-gray-500 text-[13px] text-center">
-            &copy; {new Date().getFullYear()} SnapHub.id. All rights reserved. Made with ♥ by Puja Rajistha.
+          <p className="text-gray-400 text-[13px] text-center">
+            &copy; {new Date().getFullYear()} SnapHub.id. All rights reserved. Made with ♥ by{' '}
+            <a
+              href="https://instagram.com/pujarajisthaa_aw"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline hover:text-white transition-colors"
+            >
+              Puja Rajistha
+            </a>.
           </p>
         </div>
 

@@ -1,22 +1,22 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { FiUsers, FiCamera, FiZap, FiPrinter, FiSmartphone, FiBox } from 'react-icons/fi';
-import aboutImg from '../assets/about_image.png';
+import aboutImg from '../assets/about_image.webp';
 
 const BADGES = [
-  { icon: <FiUsers />,      label: 'Professional Crew' },
-  { icon: <FiCamera />,     label: 'Premium Camera' },
-  { icon: <FiZap />,        label: 'Unlimited Session' },
-  { icon: <FiPrinter />,    label: 'Instant Print' },
+  { icon: <FiUsers />, label: 'Professional Crew' },
+  { icon: <FiCamera />, label: 'Premium Camera' },
+  { icon: <FiZap />, label: 'Unlimited Session' },
+  { icon: <FiPrinter />, label: 'Instant Print' },
   { icon: <FiSmartphone />, label: 'Digital Copy' },
-  { icon: <FiBox />,        label: 'Elegant Booth' },
+  { icon: <FiBox />, label: 'Elegant Booth' },
 ];
 
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
-const fadeUp  = { hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } };
+const fadeUp = { hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } };
 
 const About = () => {
-  const ref    = useRef(null);
+  const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
@@ -102,12 +102,12 @@ const About = () => {
                   key={b.label}
                   variants={fadeUp}
                   whileHover={{ scale: 1.04, borderColor: 'rgba(217,4,41,0.45)' }}
-                  className="glass flex items-center gap-3 px-4 py-3 rounded-xl border border-white/[0.09] cursor-default transition-all duration-300 group"
+                  className="glass flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 cursor-default transition-all duration-300 group"
                 >
                   <span className="text-[#D90429] text-[1rem] flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                     {b.icon}
                   </span>
-                  <span className="text-gray-300 text-[0.82rem] font-medium leading-tight">{b.label}</span>
+                  <span className="text-gray-400 text-[0.82rem] font-medium leading-tight">{b.label}</span>
                 </motion.div>
               ))}
             </motion.div>

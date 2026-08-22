@@ -83,7 +83,7 @@ const Maps = () => {
           >
             <div>
               <h3 className="text-white font-semibold text-base font-heading mb-0.5">Contact Info</h3>
-              <p className="text-gray-500 text-[0.78rem]">Visit or reach us anytime.</p>
+              <p className="text-gray-400 text-[0.78rem]">Visit or reach us anytime.</p>
             </div>
 
             <ul className="flex flex-col divide-y divide-white/[0.06]">
@@ -99,14 +99,14 @@ const Maps = () => {
                     {item.icon}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-gray-600 text-[0.68rem] mb-0.5 uppercase tracking-wider">{item.label}</p>
+                    <p className="text-gray-400 text-[0.68rem] mb-0.5 uppercase tracking-wider">{item.label}</p>
                     {item.href ? (
                       <a href={item.href} target="_blank" rel="noopener noreferrer"
-                        className="text-gray-300 text-[0.83rem] hover:text-[#D90429] transition-colors duration-200 leading-snug block">
+                        className="text-gray-400 text-[0.83rem] hover:text-[#D90429] transition-colors duration-200 leading-snug block">
                         {item.value}
                       </a>
                     ) : (
-                      <p className="text-gray-300 text-[0.83rem] leading-snug">{item.value}</p>
+                      <p className="text-gray-400 text-[0.83rem] leading-snug">{item.value}</p>
                     )}
                   </div>
                 </motion.li>

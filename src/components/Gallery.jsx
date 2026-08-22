@@ -2,36 +2,42 @@ import React, { useState, useRef, useCallback } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { FiX, FiChevronLeft, FiChevronRight, FiMaximize2 } from 'react-icons/fi';
 
-import weddingImg    from '../assets/gallery_wedding.png';
-import graduationImg from '../assets/gallery_graduation.png';
-import birthdayImg   from '../assets/gallery_birthday.png';
-import corporateImg  from '../assets/gallery_corporate.png';
-import familyImg     from '../assets/gallery_family.png';
-import engagementImg from '../assets/gallery_engagement.png';
+import img1 from '../assets/1.webp';
+import img2 from '../assets/2.webp';
+import img3 from '../assets/3.webp';
+import img4 from '../assets/4.webp';
+import img5 from '../assets/5.webp';
 
-const CATEGORIES = ['All', 'Wedding', 'Graduation', 'Birthday', 'Corporate', 'Family', 'Engagement'];
+const CATEGORIES = ['All', 'Event', 'Wedding'];
 
 const GALLERY = [
-  { id: 1, src: weddingImg,    cat: 'Wedding',    title: 'Elegant Wedding',        alt: 'Sewa photobooth pernikahan elegan SnapHub Jakarta — momen pengantin yang tak terlupakan',        span: 'row-span-2' },
-  { id: 2, src: graduationImg, cat: 'Graduation', title: 'Graduation Celebration', alt: 'Photobooth wisuda SnapHub — abadikan kelulusan dengan cetak foto instan berkualitas tinggi',      span: '' },
-  { id: 3, src: birthdayImg,   cat: 'Birthday',   title: 'Birthday Party',         alt: 'Photobooth ulang tahun SnapHub — booth interaktif dengan props unik untuk pesta yang meriah',    span: '' },
-  { id: 4, src: corporateImg,  cat: 'Corporate',  title: 'Corporate Gala',         alt: 'Photobooth acara korporat SnapHub — solusi profesional untuk gala dinner dan company event',      span: 'row-span-2' },
-  { id: 5, src: familyImg,     cat: 'Family',     title: 'Family Reunion',         alt: 'Photobooth reuni keluarga SnapHub — kenangan indah bersama orang-orang terkasih',               span: '' },
-  { id: 6, src: engagementImg, cat: 'Engagement', title: 'Engagement Session',     alt: 'Photobooth sesi tunangan SnapHub — momen lamaran romantis diabadikan dengan sempurna',           span: '' },
+  { id: 1, src: img1, cat: 'Event', title: 'Event Handled', alt: 'Photobooth event SnapHub Malang', span: 'row-span-2' },
+  { id: 2, src: img2, cat: 'Event', title: 'Event Handled', alt: 'Photobooth event SnapHub Malang', span: '' },
+  { id: 3, src: img3, cat: 'Event', title: 'Event Handled', alt: 'Photobooth event SnapHub Malang', span: '' },
+  { id: 4, src: img4, cat: 'Event', title: 'Event Handled', alt: 'Photobooth event SnapHub Malang', span: 'row-span-2' },
+  { id: 5, src: img5, cat: 'Event', title: 'Event Handled', alt: 'Photobooth event SnapHub Malang', span: '' },
 ];
 
 const Gallery = () => {
-  const ref    = useRef(null);
+  const ref = useRef(null);
+  const carouselRef = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
-  const [active,   setActive]   = useState('All');
+  const scroll = (direction) => {
+    if (carouselRef.current) {
+      const scrollAmount = direction === 'left' ? -320 : 320;
+      carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  const [active, setActive] = useState('All');
   const [lightbox, setLightbox] = useState(null);
 
   const filtered = active === 'All' ? GALLERY : GALLERY.filter((g) => g.cat === active);
-  const openLb   = (i) => setLightbox(i);
-  const closeLb  = ()  => setLightbox(null);
-  const prev     = useCallback(() => setLightbox((i) => (i - 1 + filtered.length) % filtered.length), [filtered.length]);
-  const next     = useCallback(() => setLightbox((i) => (i + 1) % filtered.length), [filtered.length]);
+  const openLb = (i) => setLightbox(i);
+  const closeLb = () => setLightbox(null);
+  const prev = useCallback(() => setLightbox((i) => (i - 1 + filtered.length) % filtered.length), [filtered.length]);
+  const next = useCallback(() => setLightbox((i) => (i + 1) % filtered.length), [filtered.length]);
 
   return (
     <section id="gallery" className="section-pad bg-[#0B0B0B] relative overflow-hidden">
@@ -67,11 +73,10 @@ const Gallery = () => {
                 onClick={() => setActive(cat)}
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
-                className={`px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium tracking-wide transition-all duration-300 select-none whitespace-nowrap ${
-                  active === cat
-                    ? 'bg-[#D90429] text-white border border-[#D90429] shadow-[0_0_20px_rgba(217,4,41,0.45)]'
-                    : 'glass border border-white/10 text-gray-400 hover:text-white hover:border-[#D90429]/40 hover:bg-white/[0.06]'
-                }`}
+                className={`px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium tracking-wide transition-all duration-300 select-none whitespace-nowrap ${active === cat
+                  ? 'bg-[#D90429] text-white border border-[#D90429] shadow-[0_0_20px_rgba(217,4,41,0.45)]'
+                  : 'glass border border-white/10 text-gray-400 hover:text-white hover:border-[#D90429]/40 hover:bg-white/[0.06]'
+                  }`}
               >
                 {cat}
               </motion.button>
@@ -79,42 +84,59 @@ const Gallery = () => {
           </motion.div>
         </div>
 
-        {/* ── Masonry Grid ───────────────────────── */}
-        <motion.div
-          layout
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-          style={{ gridAutoRows: '220px' }}
-        >
-          <AnimatePresence mode="popLayout">
-            {filtered.map((img, i) => (
-              <motion.div
-                key={img.id}
-                layout
-                initial={{ opacity: 0, scale: 0.92 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.92 }}
-                transition={{ duration: 0.38, delay: i * 0.04 }}
-                onClick={() => openLb(i)}
-                className={`relative rounded-2xl overflow-hidden cursor-pointer group ${img.span}`}
-              >
-                <img
-                  src={img.src}
-                  alt={img.alt || img.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.07]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
-                  <p className="text-[#D90429] text-[0.68rem] font-medium uppercase tracking-widest mb-1">{img.cat}</p>
-                  <p className="text-white font-semibold text-[0.9rem] font-heading">{img.title}</p>
-                </div>
-                <div className="absolute top-3 right-3 w-8 h-8 rounded-full glass border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <FiMaximize2 size={13} />
-                </div>
-                <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-[#D90429]/30 transition-all duration-400 pointer-events-none" />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
+        {/* ── Masonry Grid / Mobile Carousel ───────────────────────── */}
+        <div className="relative group">
+          <motion.div
+            ref={carouselRef}
+            layout
+            className="flex sm:grid overflow-x-auto sm:overflow-visible snap-x snap-mandatory sm:snap-none sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-6 sm:pb-0 -mx-5 px-5 sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth"
+            style={{ gridAutoRows: '220px' }}
+          >
+            <AnimatePresence mode="popLayout">
+              {filtered.map((img, i) => (
+                <motion.div
+                  key={img.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.92 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.92 }}
+                  transition={{ duration: 0.38, delay: i * 0.04 }}
+                  onClick={() => openLb(i)}
+                  className={`relative rounded-2xl overflow-hidden cursor-pointer group shrink-0 snap-center w-[82vw] max-w-[320px] h-[350px] sm:w-auto sm:max-w-none sm:h-auto sm:shrink sm:snap-align-none ${img.span}`}
+                >
+                  <img
+                    src={img.src}
+                    alt={img.alt || img.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.07]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
+                    <p className="text-[#D90429] text-[0.68rem] font-medium uppercase tracking-widest mb-1">{img.cat}</p>
+                    <p className="text-white font-semibold text-[0.9rem] font-heading">{img.title}</p>
+                  </div>
+                  <div className="absolute top-3 right-3 w-8 h-8 rounded-full glass border border-white/10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <FiMaximize2 size={13} />
+                  </div>
+                  <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-[#D90429]/30 transition-all duration-400 pointer-events-none" />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* Navigation Arrows (Mobile Carousel Only) */}
+          <button
+            onClick={() => scroll('left')}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-[#0B0B0B]/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-md border border-white/10 sm:hidden hover:bg-[#D90429] shadow-xl ml-2"
+          >
+            <FiChevronLeft size={24} />
+          </button>
+          <button
+            onClick={() => scroll('right')}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-[#0B0B0B]/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-md border border-white/10 sm:hidden hover:bg-[#D90429] shadow-xl mr-2"
+          >
+            <FiChevronRight size={24} />
+          </button>
+        </div>
       </div>
 
       {/* ── Lightbox ───────────────────────────── */}
@@ -149,18 +171,18 @@ const Gallery = () => {
             </motion.div>
 
             <button onClick={closeLb} aria-label="Close"
-              className="absolute top-5 right-5 w-10 h-10 glass border border-white/15 rounded-full flex items-center justify-center text-white hover:text-[#D90429] transition-colors">
+              className="absolute top-5 right-5 w-10 h-10 glass border border-white/10 rounded-full flex items-center justify-center text-white hover:text-[#D90429] transition-colors">
               <FiX size={18} />
             </button>
             <button onClick={(e) => { e.stopPropagation(); prev(); }} aria-label="Previous"
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 glass border border-white/15 rounded-full flex items-center justify-center text-white hover:text-[#D90429] transition-colors">
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 glass border border-white/10 rounded-full flex items-center justify-center text-white hover:text-[#D90429] transition-colors">
               <FiChevronLeft size={20} />
             </button>
             <button onClick={(e) => { e.stopPropagation(); next(); }} aria-label="Next"
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 glass border border-white/15 rounded-full flex items-center justify-center text-white hover:text-[#D90429] transition-colors">
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 glass border border-white/10 rounded-full flex items-center justify-center text-white hover:text-[#D90429] transition-colors">
               <FiChevronRight size={20} />
             </button>
-            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 glass border border-white/15 px-3 py-1 rounded-full text-xs text-gray-400">
+            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 glass border border-white/10 px-3 py-1 rounded-full text-xs text-gray-400">
               {lightbox + 1} / {filtered.length}
             </div>
           </motion.div>

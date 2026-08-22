@@ -9,7 +9,7 @@ const navLinks = [
   { label: 'Features', to: 'features' },
   { label: 'Gallery', to: 'gallery' },
   { label: 'Pricelist', to: 'pricelist' },
-  { label: 'Calculator', to: 'calculator' },
+  { label: 'Schedule', to: 'availability' },
   { label: 'Location', to: 'maps' },
   { label: 'Contact', to: 'contact' },
 ];
@@ -40,13 +40,13 @@ const Navbar = () => {
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
-          ? 'bg-[#0B0B0B]/98 backdrop-blur-xl border-b border-white/[0.06] shadow-[0_4px_30px_rgba(0,0,0,0.6)]'
-          : 'bg-transparent'
+        className={`fixed z-50 transition-all duration-500 max-w-6xl w-[92%] left-1/2 -translate-x-1/2 rounded-full border shadow-2xl ${scrolled
+          ? 'top-4 bg-black/30 backdrop-blur-[24px] border-white/[0.15] shadow-black/80'
+          : 'top-6 bg-white/[0.05] backdrop-blur-xl border-white/20 shadow-black/40'
           }`}
       >
-        <div className="wrap">
-          <div className="flex items-center justify-between h-[72px]">
+        <div className="px-5 md:px-8">
+          <div className="flex items-center justify-between h-16 md:h-[72px]">
 
             {/* ── Logo ───────────────────────────────────── */}
             <motion.div
@@ -69,7 +69,7 @@ const Navbar = () => {
                     to={link.to}
                     spy={true}
                     smooth={true}
-                    offset={-72}
+                    offset={0}
                     duration={650}
                     onSetActive={() => setActiveSection(link.to)}
                     className={`nav-link ${activeSection === link.to ? 'text-white' : ''}`}
@@ -164,7 +164,7 @@ const Navbar = () => {
                       to={link.to}
                       spy={true}
                       smooth={true}
-                      offset={-72}
+                      offset={0}
                       duration={650}
                       onClick={() => setMenuOpen(false)}
                       className="flex items-center justify-between border-b border-white/[0.1] text-gray-300 hover:text-white hover:bg-white/[0.05] transition-all duration-200 text-sm font-medium cursor-pointer group"

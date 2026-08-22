@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { Link } from 'react-scroll';
 import { FiChevronDown } from 'react-icons/fi';
-import heroBg from '../assets/hero_background.png';
+import heroBg from '../assets/hero_background.webp';
 
 const WA_URL = 'https://wa.me/6285190643459?text=Halo%20SnapHub%2C%20saya%20ingin%20booking%20photobooth!';
 
@@ -25,18 +25,26 @@ const STATS = [
 ];
 
 const Hero = () => {
-  const [mouse, setMouse] = useState({ x: -999, y: -999 });
   const heroRef = useRef(null);
+
+  // Optimized mouse tracking that doesn't trigger React re-renders
+  const mouseX = useMotionValue(-999);
+  const mouseY = useMotionValue(-999);
+
+  // Smooth out the mouse movement slightly for a more organic feel
+  const springX = useSpring(mouseX, { stiffness: 500, damping: 28 });
+  const springY = useSpring(mouseY, { stiffness: 500, damping: 28 });
 
   useEffect(() => {
     const el = heroRef.current;
     const handler = (e) => {
       const r = el.getBoundingClientRect();
-      setMouse({ x: e.clientX - r.left, y: e.clientY - r.top });
+      mouseX.set(e.clientX - r.left);
+      mouseY.set(e.clientY - r.top);
     };
     el?.addEventListener('mousemove', handler, { passive: true });
     return () => el?.removeEventListener('mousemove', handler);
-  }, []);
+  }, [mouseX, mouseY]);
 
   return (
     <section
@@ -51,8 +59,11 @@ const Hero = () => {
       <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-black/50" />
       <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#0B0B0B] to-transparent" />
 
-      {/* Mouse glow */}
-      <div className="hero-mouse-glow" style={{ left: mouse.x, top: mouse.y }} />
+      {/* Mouse glow - heavily optimized with direct DOM updates */}
+      <motion.div
+        className="hero-mouse-glow"
+        style={{ left: springX, top: springY }}
+      />
 
       {/* Red orb */}
       <motion.div
@@ -113,7 +124,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 22 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.7 }}
-          className="text-sm md:text-[20px] text-gray-300 max-w-xl mx-auto mb-10 leading-[1.85]"
+          className="text-sm md:text-[20px] text-gray-400 max-w-xl mx-auto mb-10 leading-[1.85]"
           style={{ paddingBottom: "10px" }}
         >
           Snap It. Share It. SnapHub.
@@ -140,7 +151,7 @@ const Hero = () => {
           </motion.a>
 
           <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-            <Link to="pricelist" smooth={true} offset={-72} duration={650}
+            <Link to="pricelist" smooth={true} offset={0} duration={650}
               className="btn-outline px-8 py-3.5 cursor-pointer">
               View Pricelist
             </Link>
@@ -158,7 +169,7 @@ const Hero = () => {
             <div key={s.label} className="flex items-center gap-6 sm:gap-12">
               <div className="text-center">
                 <div className="text-2xl sm:text-3xl font-bold text-[#D90429] font-heading leading-none">{s.num}</div>
-                <div className="text-xs sm:text-sm text-gray-500 mt-1">{s.label}</div>
+                <div className="text-xs sm:text-sm text-gray-400 mt-1">{s.label}</div>
               </div>
               {i < STATS.length - 1 && <div className="hidden sm:block w-px h-8 bg-white/10" />}
             </div>
@@ -168,7 +179,7 @@ const Hero = () => {
 
       {/* Scroll indicator */}
       <motion.div
-        className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-1.5 text-gray-600 z-10"
+        className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-1.5 text-gray-400 z-10"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.6, duration: 0.6 }}

@@ -5,7 +5,7 @@ import About from '../components/About';
 import Features from '../components/Features';
 import Gallery from '../components/Gallery';
 import Pricelist from '../components/Pricelist';
-import ProfitCalculator from '../components/ProfitCalculator';
+import BookingCalendar from '../components/BookingCalendar';
 import Maps from '../components/Maps';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
@@ -21,7 +21,8 @@ const Home = () => {
         <Features />
         <Gallery />
         <Pricelist />
-        <ProfitCalculator />
+        <BookingCalendar />
+        {/* <ProfitCalculator /> */}
         <Maps />
         <Contact />
       </main>

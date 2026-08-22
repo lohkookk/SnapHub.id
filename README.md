@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/favicon.ico" alt="SnapHub Logo" width="80" height="80" />
+  <img src="public/icons.svg" alt="SnapHub Logo" width="80" height="80" />
   
   # SnapHub.id
   **Premium Photobooth Services in Malang, Indonesia**
@@ -14,28 +14,29 @@
 
 ## 📸 About The Project
 
-SnapHub is a modern, fast, and responsive web application built for a premium photobooth service based in Malang. Designed with a sleek "dark-glassmorphism" aesthetic, it provides users with an engaging experience to explore features, view dynamic pricing, download price guides, and calculate revenue sharing for partnership events.
+SnapHub is a modern, ultra-fast, and responsive web application built for a premium photobooth service based in Malang. Designed with a sleek "dark-glassmorphism" aesthetic, it provides users with an engaging experience to explore features, view dynamic pricing, check real-time availability, and calculate revenue sharing for partnership events.
 
 ### 🌟 Key Features
 
-- **Modern UI/UX:** Built with a dark mode glassmorphism design, vibrant gradients, and smooth micro-animations.
+- **Modern UI/UX:** Built with a beautiful dark mode glassmorphism design, vibrant red accents, and highly optimized micro-animations using Framer Motion.
+- **Booking & Availability Calendar:** Integrated with Supabase, users can view real-time booked dates and availability via an interactive calendar.
+- **Admin Dashboard:** A secured backend dashboard for administrators to manage schedules, track booked dates, and monitor financial events seamlessly.
 - **Dynamic Profit Calculator:** A dedicated revenue-sharing calculator for "Event Fun Snap" partners, featuring interactive charts (Recharts) to visualize revenue distribution.
+- **Performance Optimized:** Uses native `.webp` image formatting for rapid load times and highly optimized Framer Motion `useMotionValue` for 60FPS mouse-glow tracking effects.
 - **Pricelist & PDF Integration:** Clear pricing structures with direct access to download the official PDF Price Guide.
-- **Smooth Navigation:** Single-page application feeling with smooth scrolling anchor links.
 - **Floating WhatsApp:** Persistent quick-access floating button for seamless customer communication.
-- **Interactive Maps:** Embedded Google Maps pinpointing the Malang location.
 
 ## 🛠 Built With
 
-This project is built using modern web development tools:
+This project utilizes a modern frontend and backend stack:
 
-- [React.js](https://reactjs.org/)
+- [React.js 19](https://react.dev/)
 - [Vite](https://vitejs.dev/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Framer Motion](https://www.framer.com/motion/) (Animations)
+- [Tailwind CSS 4](https://tailwindcss.com/)
+- [Framer Motion](https://www.framer.com/motion/) (UI Animations & Micro-interactions)
+- [Supabase](https://supabase.com/) (Backend-as-a-Service, Database & Auth)
 - [Recharts](https://recharts.org/) (Data Visualization)
-- [React Icons](https://react-icons.github.io/react-icons/)
-- [React Scroll](https://www.npmjs.com/package/react-scroll)
+- [React Calendar](https://github.com/wojtekmaj/react-calendar) (Booking system)
 
 ## 🚀 Getting Started
 
@@ -43,8 +44,9 @@ Follow these instructions to set up the project locally on your machine.
 
 ### Prerequisites
 
-- Node.js (v16.x or higher recommended)
+- Node.js (v18.x or higher recommended)
 - npm or yarn
+- A Supabase Project (for database credentials)
 
 ### Installation
 
@@ -60,19 +62,26 @@ Follow these instructions to set up the project locally on your machine.
    ```bash
    npm install
    ```
-4. Start the development server:
+4. Set up environment variables:
+   Create a `.env` file in the root directory and add your Supabase credentials:
+   ```env
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+5. Start the development server:
    ```bash
    npm run dev
    ```
-5. Open your browser and visit `http://localhost:5173`.
+6. Open your browser and visit `http://localhost:5173`.
 
 ## 📁 Project Structure
 
 ```text
 src/
-├── assets/         # Static assets (images, fonts)
-├── components/     # Reusable React components (Navbar, Hero, Footer, etc.)
-├── pages/          # Main page assemblies (Home.jsx)
+├── assets/         # Static assets (.webp optimized images, icons)
+├── components/     # Reusable React components (Navbar, Hero, BookingCalendar, etc.)
+├── pages/          # Main page assemblies (Home.jsx, Admin.jsx)
+├── lib/            # Configuration files (Supabase client)
 ├── index.css       # Global CSS and Tailwind configurations
 ├── App.jsx         # Main application layout and routing
 └── main.jsx        # Entry point
@@ -82,7 +91,7 @@ public/
 
 ## 🌐 Deployment
 
-This project is optimized for deployment on [Vercel](https://vercel.com). Because it uses Vite, the build command is `npm run build` and the output directory is `dist`.
+This project is optimized for deployment on [Vercel](https://vercel.com). Because it uses Vite, the build command is `npm run build` and the output directory is `dist`. Ensure you add your Supabase Environment Variables to your Vercel project settings.
 
 Live Deployment URL: [snaphub-akasha.vercel.app](https://snaphub-akasha.vercel.app)
 

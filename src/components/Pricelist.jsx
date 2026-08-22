@@ -2,7 +2,6 @@ import React, { useRef, useState } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { FiDownload, FiCheck, FiClock, FiPrinter, FiCamera, FiInfo } from 'react-icons/fi';
 
-import pricelistImg from '../assets/pricelist_image.png';
 
 const WA_URL = 'https://wa.me/6285190643459?text=Halo%20SnapHub%2C%20saya%20ingin%20booking%20photobooth!';
 
@@ -105,9 +104,9 @@ const PACKAGES = [
 const TNC = [
   { num: '01', text: 'Penyewa WAJIB DP 30% untuk booking tanggal acara.' },
   { num: '02', text: 'Pelunasan H-1 sebelum tanggal acara berlangsung.' },
-  { num: '03', text: 'Pembayaran via QRIS atau Bank Transfer — Bank Jago a/n Made Puja Rajistha AW · No Rek: 102302896677.' },
+  { num: '03', text: 'Konfirmasi perpindahan tanggal acara maksimal H-7 sebelum acara.' },
   { num: '04', text: 'Jika cancel booking, DP dinyatakan Hangus.' },
-  { num: '05', text: 'Konfirmasi perpindahan tanggal acara maksimal H-7 sebelum acara.' },
+  { num: '05', text: 'Pembayaran via QRIS atau Bank Transfer — Bank Jago a/n Made Puja Rajistha AW · No Rek: 102302896677.' },
   { num: '06', text: 'Penyewa wajib mengisi FORMAT ORDER dan mendapat invoice dari tim SnapHub.' },
   { num: '07', text: 'Tim SnapHub standby di lokasi ±1 jam sebelum jam order.' },
 ];
@@ -118,14 +117,14 @@ const PriceRow = ({ item, index }) => (
     initial={{ opacity: 0, x: -10 }}
     animate={{ opacity: 1, x: 0 }}
     transition={{ delay: index * 0.035, duration: 0.22 }}
-    className="flex items-center justify-between py-2.5 border-b border-white/[0.06] last:border-b-0"
+    className="flex items-center justify-between py-3.5 border-b border-white/10 last:border-b-0"
   >
     <div className="flex items-center gap-2.5">
       <FiClock size={12} className="text-[#D90429] shrink-0 opacity-60" />
       <div className="leading-none">
         <span className="text-white text-[13px] font-medium">{item.label}</span>
         {item.sub && (
-          <span className="text-gray-500 text-[11px] ml-1.5">({item.sub})</span>
+          <span className="text-gray-400 text-[11px] ml-1.5">({item.sub})</span>
         )}
       </div>
     </div>
@@ -220,7 +219,7 @@ const Pricelist = () => {
             className="max-w-5xl mx-auto"
           >
             {/* Package title row */}
-            <div className="flex flex-wrap items-center gap-3 mb-5">
+            <div className="flex flex-wrap items-center gap-4 mb-6">
               <div className="w-9 h-9 rounded-xl bg-[#D90429]/15 border border-[#D90429]/25 flex items-center justify-center text-[#D90429] shrink-0">
                 {pkg.icon}
               </div>
@@ -233,43 +232,45 @@ const Pricelist = () => {
                     </span>
                   )}
                 </div>
-                <p className="text-gray-500 text-xs mt-1">{pkg.tagline}</p>
+                <p className="text-gray-400 text-xs mt-1">{pkg.tagline}</p>
               </div>
               <div className="text-right shrink-0">
-                <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-0.5">Mulai dari</div>
+                <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-0.5">Mulai dari</div>
                 <div className="text-xl font-bold text-white">{pkg.startFrom}</div>
               </div>
             </div>
 
             {/* Two-column layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 items-stretch">
               {/* LEFT — Features */}
-              <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 md:p-6 flex flex-col">
-                <p className="text-[10px] uppercase tracking-[0.15em] text-gray-500 mb-4 font-semibold">
+              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 md:p-7 flex flex-col">
+                <p className="text-[10px] uppercase tracking-[0.15em] text-gray-400 mb-10 font-semibold">
                   Sudah Termasuk
                 </p>
-                <ul className="space-y-2.5 flex-1">
+                <ul className="space-y-3 flex-1">
                   {pkg.features.map((f, i) => (
                     <li key={i} className="flex items-start gap-2.5">
                       <div className="w-4 h-4 rounded-full bg-[#D90429]/15 border border-[#D90429]/30 flex items-center justify-center shrink-0 mt-px">
                         <FiCheck size={8} className="text-[#D90429]" />
                       </div>
-                      <span className="text-gray-300 text-[13px] leading-snug">{f}</span>
+                      <span className="text-gray-400 text-[13px] leading-snug">{f}</span>
                     </li>
                   ))}
                 </ul>
                 {/* Additional time note */}
-                <div className="mt-5 pt-4 border-t border-white/[0.06]">
-                  <p className="text-[11px] text-gray-500 leading-relaxed">
-                    <span className="text-[#D90429] font-semibold">Tambah waktu</span>{' '}(tanpa print):{' '}
-                    <span className="text-white font-medium">Rp 500.000 / jam</span>
-                  </p>
-                </div>
+                {pkg.id === 'limited' && (
+                  <div className="mt-5 pt-4 border-t border-white/10">
+                    <p className="text-[11px] text-gray-400 leading-relaxed">
+                      <span className="text-[#D90429] font-semibold">Tambah waktu</span>{' '}(tanpa print):{' '}
+                      <span className="text-white font-medium">Rp 500.000 / jam</span>
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* RIGHT — Price List */}
-              <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 md:p-6">
-                <p className="text-[10px] uppercase tracking-[0.15em] text-gray-500 mb-4 font-semibold">
+              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 md:p-7">
+                <p className="text-[10px] uppercase tracking-[0.15em] text-gray-400 mb-4 font-semibold">
                   Daftar Harga
                 </p>
                 <div>
@@ -287,24 +288,24 @@ const Pricelist = () => {
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.45 }}
-          className="max-w-5xl mx-auto mt-4"
+          className="max-w-5xl mx-auto mt-8"
         >
-          <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-5 md:p-6">
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 md:p-7">
             <div className="flex items-center gap-3 mb-5">
               <div className="h-px flex-1 bg-white/[0.06]" />
-              <h3 className="text-[10px] font-semibold text-gray-500 uppercase tracking-[0.15em] whitespace-nowrap flex items-center gap-1.5">
+              <h3 className="text-[10px] font-semibold text-gray-400 uppercase tracking-[0.15em] whitespace-nowrap flex items-center gap-1.5">
                 <FiInfo size={10} /> Syarat &amp; Ketentuan
               </h3>
               <div className="h-px flex-1 bg-white/[0.06]" />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-5">
               {TNC.map((item, i) => (
                 <div key={i} className="flex items-start gap-3">
                   <span className="text-[#D90429]/40 text-[10px] font-bold font-mono mt-0.5 shrink-0 tabular-nums w-4">
                     {item.num}
                   </span>
-                  <p className="text-gray-500 text-[12px] leading-relaxed">{item.text}</p>
+                  <p className="text-gray-400 text-[12px] leading-relaxed">{item.text}</p>
                 </div>
               ))}
             </div>
@@ -316,14 +317,14 @@ const Pricelist = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.55, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-8"
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10"
         >
           <motion.a
             href="/PriceGuideSnapHub.id.pdf"
             download="PriceGuideSnapHub.pdf"
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
-            className="btn-outline"
+            className="btn-outline w-[240px] justify-center"
           >
             <FiDownload className="flex-shrink-0" /> Download Pricelist
           </motion.a>
@@ -334,7 +335,7 @@ const Pricelist = () => {
             rel="noopener noreferrer"
             whileHover={{ scale: 1.04, boxShadow: '0 0 30px rgba(217,4,41,0.5)' }}
             whileTap={{ scale: 0.97 }}
-            className="btn-primary"
+            className="btn-primary w-[240px] justify-center"
           >
             <WaIcon /> Book Now
           </motion.a>
