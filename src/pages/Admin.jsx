@@ -165,6 +165,7 @@ const Admin = () => {
       icon: <FiDollarSign size={20} />,
       subTabs: [
         { id: 'finance_events', label: 'Keuangan Event' },
+        { id: 'finance_operational', label: 'Pengeluaran Operasional' },
         { id: 'finance_recap', label: 'Rekapitulasi Event' },
         { id: 'finance_target', label: 'Target & Pencapaian' },
       ]
@@ -332,6 +333,7 @@ const Admin = () => {
             {activeTab === 'schedule' && <AdminSchedule />}
             {activeTab === 'gallery' && <AdminGallery />}
             {activeTab === 'finance_events' && <AdminFinance activeSubTab="events" />}
+            {activeTab === 'finance_operational' && <AdminFinance activeSubTab="operational" />}
             {activeTab === 'finance_recap' && <AdminFinance activeSubTab="recap" />}
             {activeTab === 'finance_target' && <AdminFinance activeSubTab="target" />}
 

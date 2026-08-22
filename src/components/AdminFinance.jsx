@@ -16,6 +16,8 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
   const [eventSearchQuery, setEventSearchQuery] = useState('');
   const [eventSortOrder, setEventSortOrder] = useState('newest');
   const [recapSortOrder, setRecapSortOrder] = useState('newest');
+  const [operationalSearchQuery, setOperationalSearchQuery] = useState('');
+  const [operationalSortOrder, setOperationalSortOrder] = useState('dateDesc');
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [isEditingIncome, setIsEditingIncome] = useState(false);
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, type: '', id: null, title: '', message: '' });
@@ -38,7 +40,9 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
 
   // Forms State
   const [newEvent, setNewEvent] = useState({ name: '', date: '' });
-  const [newTransaction, setNewTransaction] = useState({ type: 'fixed_cost', description: '', amount: '', event_id: '' });
+  const [newTransaction, setNewTransaction] = useState({ type: 'event_expense', description: '', amount: '', event_id: '' });
+  const [newOperationalExpense, setNewOperationalExpense] = useState({ description: '', amount: '', date: format(new Date(), 'yyyy-MM-dd') });
+  const [operationalExpenses, setOperationalExpenses] = useState([]);
 
   useEffect(() => {
     fetchData();
@@ -69,11 +73,11 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
         const targets = {};
         settingsData.forEach(t => targets[t.key] = t.value);
         setAllTargets(targets);
-        
+
         if (targets['target_all_time']) {
           setTargetAllTime(new Intl.NumberFormat('id-ID').format(targets['target_all_time']));
         }
-        
+
         const currentKey = `target_keuntungan_${format(new Date(), 'yyyy-MM')}`;
         if (targets[currentKey]) {
           setTargetKeuntungan(new Intl.NumberFormat('id-ID').format(targets[currentKey]));
@@ -84,8 +88,16 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
         if (targets['custom_targets']) {
           try {
             setCustomTargets(JSON.parse(targets['custom_targets']));
-          } catch(e) {
+          } catch (e) {
             setCustomTargets([]);
+          }
+        }
+
+        if (targets['operational_expenses']) {
+          try {
+            setOperationalExpenses(JSON.parse(targets['operational_expenses']));
+          } catch (e) {
+            setOperationalExpenses([]);
           }
         }
       }
@@ -141,7 +153,7 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
   const handleAddCustomTarget = async (e) => {
     e.preventDefault();
     if (!newCustomTarget.name || !newCustomTarget.amount) return;
-    
+
     setIsUpdatingTarget(true);
     try {
       const newTarget = {
@@ -150,10 +162,10 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
         amount: getRawNumber(newCustomTarget.amount)
       };
       const updatedList = [...customTargets, newTarget];
-      
+
       const { error } = await supabase.from('settings').upsert({ key: 'custom_targets', value: JSON.stringify(updatedList) }, { onConflict: 'key' });
       if (error) throw error;
-      
+
       setCustomTargets(updatedList);
       setNewCustomTarget({ name: '', amount: '' });
       toast.success('Target Kustom berhasil ditambahkan!');
@@ -170,7 +182,7 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
       const updatedList = customTargets.filter(t => t.id !== id);
       const { error } = await supabase.from('settings').upsert({ key: 'custom_targets', value: JSON.stringify(updatedList) }, { onConflict: 'key' });
       if (error) throw error;
-      
+
       setCustomTargets(updatedList);
       toast.success('Target Kustom berhasil dihapus!');
     } catch (error) {
@@ -216,7 +228,7 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
       toast.error('Password salah!');
       return;
     }
-    
+
     if (passwordModal.action === 'add_event') {
       executeAddEvent();
     }
@@ -278,6 +290,43 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
     } catch (error) {
       toast.error('Gagal menambah transaksi');
       console.error(error);
+    }
+  };
+
+  const handleAddOperationalExpense = async (e) => {
+    e.preventDefault();
+    try {
+      const newItem = {
+        id: Date.now().toString(),
+        date: newOperationalExpense.date || new Date().toISOString().split('T')[0],
+        description: newOperationalExpense.description,
+        amount: getRawNumber(newOperationalExpense.amount)
+      };
+
+      const updatedList = [...operationalExpenses, newItem];
+
+      const { error } = await supabase.from('settings').upsert({ key: 'operational_expenses', value: JSON.stringify(updatedList) }, { onConflict: 'key' });
+      if (error) throw error;
+
+      toast.success('Pengeluaran operasional berhasil ditambahkan!');
+      setOperationalExpenses(updatedList);
+      setNewOperationalExpense({ description: '', amount: '', date: format(new Date(), 'yyyy-MM-dd') });
+    } catch (error) {
+      toast.error('Gagal menambah pengeluaran operasional');
+      console.error(error);
+    }
+  };
+
+  const handleDeleteOperationalExpense = async (id) => {
+    try {
+      const updatedList = operationalExpenses.filter(item => item.id !== id);
+      const { error } = await supabase.from('settings').upsert({ key: 'operational_expenses', value: JSON.stringify(updatedList) }, { onConflict: 'key' });
+      if (error) throw error;
+
+      toast.success('Pengeluaran operasional dihapus');
+      setOperationalExpenses(updatedList);
+    } catch (error) {
+      toast.error('Gagal menghapus pengeluaran operasional');
     }
   };
 
@@ -540,26 +589,26 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
 
                   {!event.is_locked && (
                     <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-3 flex flex-col gap-2 mt-2">
-                      <input 
-                        type="text" 
-                        placeholder="Deskripsi pengeluaran..." 
-                        value={newTransaction.event_id === event.id ? newTransaction.description : ''} 
-                        onChange={e => setNewTransaction({ type: 'event_expense', event_id: event.id, description: e.target.value, amount: newTransaction.amount })} 
-                        className="w-full bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-lg px-3 py-2 text-sm text-[var(--admin-text-main)] focus:border-[#E79EA7] outline-none" 
+                      <input
+                        type="text"
+                        placeholder="Deskripsi pengeluaran..."
+                        value={newTransaction.event_id === event.id ? newTransaction.description : ''}
+                        onChange={e => setNewTransaction({ type: 'event_expense', event_id: event.id, description: e.target.value, amount: newTransaction.amount })}
+                        className="w-full bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-lg px-3 py-2 text-sm text-[var(--admin-text-main)] focus:border-[#E79EA7] outline-none"
                       />
                       <div className="flex gap-2">
-                        <input 
-                          type="text" 
-                          placeholder="Nominal Rp" 
-                          value={newTransaction.event_id === event.id ? newTransaction.amount : ''} 
-                          onChange={e => handleNumberInput(e.target.value, val => setNewTransaction(prev => ({ ...prev, amount: val })))} 
-                          className="w-full flex-1 bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-lg px-3 py-2 text-sm text-[var(--admin-text-main)] focus:border-[#E79EA7] outline-none" 
+                        <input
+                          type="text"
+                          placeholder="Nominal Rp"
+                          value={newTransaction.event_id === event.id ? newTransaction.amount : ''}
+                          onChange={e => handleNumberInput(e.target.value, val => setNewTransaction(prev => ({ ...prev, amount: val })))}
+                          className="w-full flex-1 bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-lg px-3 py-2 text-sm text-[var(--admin-text-main)] focus:border-[#E79EA7] outline-none"
                         />
-                        <button 
+                        <button
                           onClick={(e) => {
                             if (!newTransaction.description || !newTransaction.amount || newTransaction.event_id !== event.id) return;
                             handleAddTransaction(e);
-                          }} 
+                          }}
                           className="bg-[var(--admin-accent)] hover:bg-[#E79EA7]/80 text-[var(--admin-surface)] px-4 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
                         >
                           <FiPlus size={16} /> Tambah
@@ -570,7 +619,7 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
                 </div>
               </div>
             </div>
-            
+
             {/* Footer / Aksi Utama */}
             <div className="p-5 border-t border-[var(--admin-border)] bg-[var(--admin-surface)] flex justify-end">
               <button onClick={() => handleToggleLock(event.id, event.is_locked)} className={`px-8 py-2.5 rounded-xl flex items-center gap-2 font-bold transition-colors ${event.is_locked ? 'bg-[var(--admin-border-subtle)] border border-[#64D194]/30 text-[#64D194] hover:bg-[#64D194] hover:text-[var(--admin-surface)]' : 'bg-[#C9868F] text-[var(--admin-surface)] hover:bg-[var(--admin-accent)]'}`}>
@@ -584,7 +633,7 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
     }
 
     let filteredMasterEvents = events.filter(ev => ev.name.toLowerCase().includes(eventSearchQuery.toLowerCase()));
-    
+
     // Sorting Logic
     if (eventSortOrder === 'newest') {
       filteredMasterEvents.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -656,8 +705,8 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
           </div>
         </div>
 
-      {/* Tabel Master Event */}
-      <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-6 rounded-[1.5rem] shadow-[var(--admin-shadow)]">
+        {/* Tabel Master Event */}
+        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-6 rounded-[1.5rem] shadow-[var(--admin-shadow)]">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <h3 className="text-[var(--admin-accent)] font-semibold">Daftar Keuangan Event</h3>
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
@@ -685,7 +734,7 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
               </select>
             </div>
           </div>
-          
+
           {/* Desktop Table */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[600px]">
@@ -807,54 +856,72 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
     try {
       const doc = new jsPDF();
 
-        doc.setFontSize(16);
-        doc.text("Laporan Rekapitulasi Keuangan Event", 14, 22);
-        doc.setFontSize(10);
-        doc.text("Dibuat pada: " + format(new Date(), 'dd MMMM yyyy HH:mm'), 14, 30);
+      doc.setFontSize(16);
+      doc.text("Laporan Rekapitulasi Keuangan Event", 14, 22);
+      doc.setFontSize(10);
+      doc.text("Dibuat pada: " + format(new Date(), 'dd MMMM yyyy HH:mm'), 14, 30);
 
-        const tableColumn = ["Nama Event", "Tanggal", "Pemasukan", "Pengeluaran", "Laba Bersih"];
-        const tableRows = [];
+      const tableColumn = ["Nama Event", "Tanggal", "Pemasukan", "Pengeluaran", "Laba Bersih"];
+      const tableRows = [];
 
-        const filteredEvents = events.filter(ev => ev.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      const filteredEvents = events.filter(ev => ev.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
-        let totalPemasukan = 0;
-        let totalPengeluaran = 0;
+      let totalPemasukan = 0;
+      let totalPengeluaran = 0;
 
-        filteredEvents.forEach(ev => {
-          const evExpenses = transactions.filter(t => t.event_id === ev.id && t.type === 'event_expense').reduce((sum, t) => sum + Number(t.amount), 0);
-          const evProfit = Number(ev.income) - evExpenses;
+      filteredEvents.forEach(ev => {
+        const evExpenses = transactions.filter(t => t.event_id === ev.id && t.type === 'event_expense').reduce((sum, t) => sum + Number(t.amount), 0);
+        const evProfit = Number(ev.income) - evExpenses;
 
-          totalPemasukan += Number(ev.income);
-          totalPengeluaran += evExpenses;
+        totalPemasukan += Number(ev.income);
+        totalPengeluaran += evExpenses;
 
-          const eventData = [
-            ev.name,
-            format(new Date(ev.date), 'dd MMM yyyy'),
-            formatIDR(ev.income),
-            formatIDR(evExpenses),
-            formatIDR(evProfit)
-          ];
-          tableRows.push(eventData);
-        });
+        const eventData = [
+          ev.name,
+          format(new Date(ev.date), 'dd MMM yyyy'),
+          formatIDR(ev.income),
+          formatIDR(evExpenses),
+          formatIDR(evProfit)
+        ];
+        tableRows.push(eventData);
+      });
 
-        tableRows.push([
-          "TOTAL",
-          "",
-          formatIDR(totalPemasukan),
-          formatIDR(totalPengeluaran),
-          formatIDR(totalPemasukan - totalPengeluaran)
-        ]);
+      tableRows.push([
+        "SUBTOTAL",
+        "",
+        formatIDR(totalPemasukan),
+        formatIDR(totalPengeluaran),
+        formatIDR(totalPemasukan - totalPengeluaran)
+      ]);
 
-        autoTable(doc, {
-          head: [tableColumn],
-          body: tableRows,
-          startY: 35,
-          theme: 'grid',
-          headStyles: { fillColor: [217, 4, 41] },
-        });
+      const totalOperasional = operationalExpenses.reduce((sum, t) => sum + Number(t.amount), 0);
 
-        doc.save(`Rekapitulasi_Keuangan_${format(new Date(), 'MMM_yyyy')}.pdf`);
-        toast.success("PDF berhasil diunduh");
+      tableRows.push([
+        "PENG. OPERASIONAL",
+        "",
+        "",
+        formatIDR(totalOperasional),
+        ""
+      ]);
+
+      tableRows.push([
+        "LABA BERSIH TOTAL",
+        "",
+        "",
+        "",
+        formatIDR((totalPemasukan - totalPengeluaran) - totalOperasional)
+      ]);
+
+      autoTable(doc, {
+        head: [tableColumn],
+        body: tableRows,
+        startY: 35,
+        theme: 'grid',
+        headStyles: { fillColor: [217, 4, 41] },
+      });
+
+      doc.save(`Rekapitulasi_Keuangan_${format(new Date(), 'MMM_yyyy')}.pdf`);
+      toast.success("PDF berhasil diunduh");
     } catch (error) {
       console.error(error);
       toast.error("Gagal mengunduh PDF");
@@ -885,6 +952,9 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
       return sum + exps;
     }, 0);
     const totalFilteredLaba = totalFilteredPemasukan - totalFilteredPengeluaran;
+
+    const totalOperational = operationalExpenses.reduce((sum, t) => sum + Number(t.amount), 0);
+    const finalLaba = totalFilteredLaba - totalOperational;
 
     return (
       <div className="space-y-8 max-w-[1100px]">
@@ -956,11 +1026,20 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
               {/* Total Row */}
               {filteredEvents.length > 0 && (
                 <tfoot>
-                  <tr className="bg-[var(--admin-hover-bg)] border-t-2 border-[#E79EA7]/20 sticky bottom-0">
-                    <td colSpan="2" className="py-4 px-4 text-sm text-[var(--admin-text-main)] font-bold text-right">TOTAL</td>
-                    <td className="py-4 px-4 text-sm font-bold text-[#64D194] text-right">{formatIDR(totalFilteredPemasukan)}</td>
-                    <td className="py-4 px-4 text-sm font-bold text-[#D28A94] text-right">{formatIDR(totalFilteredPengeluaran)}</td>
-                    <td className="py-4 px-4 text-sm font-bold text-[var(--admin-accent)] text-right">{formatIDR(totalFilteredLaba)}</td>
+                  <tr className="bg-[var(--admin-hover-bg)] border-t-2 border-[#E79EA7]/20">
+                    <td colSpan="2" className="py-2 px-4 text-sm text-[var(--admin-text-main)] font-medium text-right">Subtotal Event</td>
+                    <td className="py-2 px-4 text-sm font-medium text-[#64D194] text-right">{formatIDR(totalFilteredPemasukan)}</td>
+                    <td className="py-2 px-4 text-sm font-medium text-[#D28A94] text-right">{formatIDR(totalFilteredPengeluaran)}</td>
+                    <td className="py-2 px-4 text-sm font-bold text-[var(--admin-accent)] text-right">{formatIDR(totalFilteredLaba)}</td>
+                  </tr>
+                  <tr className="bg-[var(--admin-hover-bg)]">
+                    <td colSpan="3" className="py-2 px-4 text-sm text-[var(--admin-text-main)] font-medium text-right">Pengeluaran Operasional</td>
+                    <td className="py-2 px-4 text-sm font-medium text-[#D28A94] text-right">{formatIDR(totalOperational)}</td>
+                    <td className="py-2 px-4"></td>
+                  </tr>
+                  <tr className="bg-[var(--admin-surface)] border-t-2 border-[#E79EA7]/20 sticky bottom-0">
+                    <td colSpan="4" className="py-4 px-4 text-sm text-[var(--admin-text-main)] font-bold text-right">LABA BERSIH TOTAL</td>
+                    <td className="py-4 px-4 text-sm font-bold text-[var(--admin-accent)] text-right">{formatIDR(finalLaba)}</td>
                   </tr>
                 </tfoot>
               )}
@@ -998,22 +1077,26 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
             {filteredEvents.length === 0 && (
               <div className="text-center text-[var(--admin-text-muted)] py-8 text-sm">Tidak ada event ditemukan.</div>
             )}
-            
+
             {/* Mobile Total Row */}
             {filteredEvents.length > 0 && (
               <div className="bg-[var(--admin-hover-bg)] border-2 border-[#E79EA7]/20 p-4 rounded-xl flex flex-col gap-2 mt-2">
                 <div className="text-[var(--admin-text-main)] font-bold text-sm mb-1 border-b border-[#E79EA7]/20 pb-2">TOTAL KESELURUHAN</div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[var(--admin-text-muted)] text-xs">Pemasukan:</span>
+                  <span className="text-[var(--admin-text-muted)] text-xs">Subtotal Pemasukan:</span>
                   <span className="text-[#64D194] font-medium text-sm">{formatIDR(totalFilteredPemasukan)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[var(--admin-text-muted)] text-xs">Pengeluaran:</span>
+                  <span className="text-[var(--admin-text-muted)] text-xs">Subtotal Peng. Event:</span>
                   <span className="text-[#D28A94] font-medium text-sm">{formatIDR(totalFilteredPengeluaran)}</span>
                 </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[var(--admin-text-muted)] text-xs">Pengeluaran Operasional:</span>
+                  <span className="text-[#D28A94] font-medium text-sm">{formatIDR(totalOperational)}</span>
+                </div>
                 <div className="flex justify-between items-center pt-2 border-t border-[#E79EA7]/20 mt-1">
-                  <span className="text-[var(--admin-text-main)] text-xs font-bold">Laba Bersih:</span>
-                  <span className="text-[var(--admin-accent)] font-bold text-sm">{formatIDR(totalFilteredLaba)}</span>
+                  <span className="text-[var(--admin-text-main)] text-xs font-bold">Laba Bersih Total:</span>
+                  <span className="text-[var(--admin-accent)] font-bold text-sm">{formatIDR(finalLaba)}</span>
                 </div>
               </div>
             )}
@@ -1039,9 +1122,19 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
       monthlyStats[monthStr].count += 1;
     });
 
+    // Kurangi dengan pengeluaran operasional di bulan tersebut
+    operationalExpenses.forEach(t => {
+      if (!t.date) return;
+      const monthStr = format(new Date(t.date), 'yyyy-MM');
+      if (!monthlyStats[monthStr]) {
+        monthlyStats[monthStr] = { profit: 0, count: 0 };
+      }
+      monthlyStats[monthStr].profit -= Number(t.amount);
+    });
+
     return (
       <div className="space-y-8 max-w-[1100px]">
-        
+
         {/* Target Keseluruhan (All-Time) */}
         <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-6 rounded-[1.5rem] shadow-[var(--admin-shadow)] animate-fade-in-up">
           <h3 className="text-[var(--admin-accent)] font-semibold mb-4 flex items-center gap-2"><FiTarget /> Pengaturan Target Keseluruhan</h3>
@@ -1069,7 +1162,7 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
         </div>
 
         {/* Target Bulanan & Tabel Log */}
-        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-6 rounded-[1.5rem] shadow-[var(--admin-shadow)] animate-fade-in-up" style={{animationDelay: '100ms'}}>
+        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-6 rounded-[1.5rem] shadow-[var(--admin-shadow)] animate-fade-in-up" style={{ animationDelay: '100ms' }}>
           <h3 className="text-[var(--admin-accent)] font-semibold mb-4 flex items-center gap-2"><FiCalendar /> Pengaturan Target Bulanan</h3>
           {isEditingMonthly ? (
             <form onSubmit={handleUpdateMonthly} className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -1101,55 +1194,55 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
             <h4 className="text-sm font-semibold text-[var(--admin-text-main)] mb-3">Log Pencapaian Target per Bulan</h4>
             <table className="w-full text-left border-collapse">
               <thead className="sticky top-0 z-10 bg-[var(--admin-surface)]">
-              <tr className="border-b border-[var(--admin-border)] text-[var(--admin-text-muted)] text-sm bg-[var(--admin-hover-bg)]">
-                <th className="py-3 px-4 font-medium rounded-tl-xl">Bulan</th>
-                <th className="py-3 px-4 font-medium text-center">Jumlah Event</th>
-                <th className="py-3 px-4 font-medium text-right">Target Keuntungan</th>
-                <th className="py-3 px-4 font-medium text-right">Laba Tercapai</th>
-                <th className="py-3 px-4 font-medium text-center rounded-tr-xl">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.keys(monthlyStats).length > 0 ? (
-                Object.keys(monthlyStats).sort((a, b) => b.localeCompare(a)).map(monthKey => {
-                  const stat = monthlyStats[monthKey];
-                  const rawTarget = allTargets[`target_keuntungan_${monthKey}`] || allTargets['target_keuntungan'] || 10000000;
-                  const isAchieved = stat.profit >= rawTarget;
-                  const percentage = Math.min((stat.profit / rawTarget) * 100, 100).toFixed(1);
-
-                  return (
-                    <tr key={monthKey} className="border-b border-[var(--admin-border)]/50 hover:bg-[var(--admin-hover-bg)] transition-colors">
-                      <td className="py-3 px-4 text-sm text-[var(--admin-text-main)] font-medium">{format(new Date(monthKey + '-01'), 'MMMM yyyy')}</td>
-                      <td className="py-3 px-4 text-sm text-[var(--admin-text-main)] text-center">{stat.count} Event</td>
-                      <td className="py-3 px-4 text-sm font-medium text-[var(--admin-text-muted)] text-right">{formatIDR(rawTarget)}</td>
-                      <td className="py-3 px-4 text-sm font-bold text-[var(--admin-accent)] text-right">{formatIDR(stat.profit)}</td>
-                      <td className="py-3 px-4 text-center">
-                        <span className={`text-xs px-3 py-1 rounded-full ${isAchieved ? 'bg-[#64D194]/20 text-[#64D194]' : 'bg-[#D28A94]/20 text-[#D28A94]'}`}>
-                          {isAchieved ? 'Tercapai' : `${percentage}%`}
-                        </span>
-                      </td>
-                    </tr>
-                  )
-                })
-              ) : (
-                <tr>
-                  <td colSpan="5" className="py-8 text-center text-[var(--admin-text-muted)] text-sm">Belum ada data pencapaian.</td>
+                <tr className="border-b border-[var(--admin-border)] text-[var(--admin-text-muted)] text-sm bg-[var(--admin-hover-bg)]">
+                  <th className="py-3 px-4 font-medium rounded-tl-xl">Bulan</th>
+                  <th className="py-3 px-4 font-medium text-center">Jumlah Event</th>
+                  <th className="py-3 px-4 font-medium text-right">Target Keuntungan</th>
+                  <th className="py-3 px-4 font-medium text-right">Laba Tercapai</th>
+                  <th className="py-3 px-4 font-medium text-center rounded-tr-xl">Status</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {Object.keys(monthlyStats).length > 0 ? (
+                  Object.keys(monthlyStats).sort((a, b) => b.localeCompare(a)).map(monthKey => {
+                    const stat = monthlyStats[monthKey];
+                    const rawTarget = allTargets[`target_keuntungan_${monthKey}`] || allTargets['target_keuntungan'] || 10000000;
+                    const isAchieved = stat.profit >= rawTarget;
+                    const percentage = Math.min((stat.profit / rawTarget) * 100, 100).toFixed(1);
+
+                    return (
+                      <tr key={monthKey} className="border-b border-[var(--admin-border)]/50 hover:bg-[var(--admin-hover-bg)] transition-colors">
+                        <td className="py-3 px-4 text-sm text-[var(--admin-text-main)] font-medium">{format(new Date(monthKey + '-01'), 'MMMM yyyy')}</td>
+                        <td className="py-3 px-4 text-sm text-[var(--admin-text-main)] text-center">{stat.count} Event</td>
+                        <td className="py-3 px-4 text-sm font-medium text-[var(--admin-text-muted)] text-right">{formatIDR(rawTarget)}</td>
+                        <td className="py-3 px-4 text-sm font-bold text-[var(--admin-accent)] text-right">{formatIDR(stat.profit)}</td>
+                        <td className="py-3 px-4 text-center">
+                          <span className={`text-xs px-3 py-1 rounded-full ${isAchieved ? 'bg-[#64D194]/20 text-[#64D194]' : 'bg-[#D28A94]/20 text-[#D28A94]'}`}>
+                            {isAchieved ? 'Tercapai' : `${percentage}%`}
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="py-8 text-center text-[var(--admin-text-muted)] text-sm">Belum ada data pencapaian.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
         {/* Target Kustom */}
-        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-6 rounded-[1.5rem] shadow-[var(--admin-shadow)] overflow-hidden flex flex-col animate-fade-in-up" style={{animationDelay: '200ms'}}>
+        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-6 rounded-[1.5rem] shadow-[var(--admin-shadow)] overflow-hidden flex flex-col animate-fade-in-up" style={{ animationDelay: '200ms' }}>
           <h3 className="text-[var(--admin-accent)] font-semibold mb-4 flex items-center gap-2"><FiBox /> Daftar Target Kustom / Impian</h3>
-          
+
           <form onSubmit={handleAddCustomTarget} className="flex flex-col sm:flex-row gap-4 mb-6 pb-6 border-b border-[var(--admin-border-subtle)]">
-            <input type="text" placeholder="Nama Target (misal: Beli Lensa)" value={newCustomTarget.name} onChange={e => setNewCustomTarget({...newCustomTarget, name: e.target.value})} className="flex-1 bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[#E79EA7]" required />
+            <input type="text" placeholder="Nama Target (misal: Beli Lensa)" value={newCustomTarget.name} onChange={e => setNewCustomTarget({ ...newCustomTarget, name: e.target.value })} className="flex-1 bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[#E79EA7]" required />
             <div className="relative w-full sm:w-64">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)] font-medium">Rp</span>
-              <input type="text" required value={newCustomTarget.amount} onChange={e => handleNumberInput(e.target.value, (val) => setNewCustomTarget({...newCustomTarget, amount: val}))} className="w-full bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-4 py-2.5 text-[var(--admin-text-main)] font-bold focus:outline-none focus:border-[#E79EA7]" placeholder="0" />
+              <input type="text" required value={newCustomTarget.amount} onChange={e => handleNumberInput(e.target.value, (val) => setNewCustomTarget({ ...newCustomTarget, amount: val }))} className="w-full bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-4 py-2.5 text-[var(--admin-text-main)] font-bold focus:outline-none focus:border-[#E79EA7]" placeholder="0" />
             </div>
             <button type="submit" disabled={isUpdatingTarget} className="bg-[var(--admin-accent-bg)] hover:bg-[var(--admin-accent)] text-[var(--admin-accent)] hover:text-[var(--admin-surface)] border border-[#E79EA7]/30 border-solid font-semibold rounded-xl px-6 py-2.5 transition-colors flex items-center gap-2 text-sm whitespace-nowrap">
               <FiPlus /> Tambah
@@ -1181,6 +1274,122 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
     );
   };
 
+  const renderOperationalTab = () => {
+    let filteredOperational = operationalExpenses.filter(exp =>
+      exp.description.toLowerCase().includes(operationalSearchQuery.toLowerCase())
+    );
+
+    if (operationalSortOrder === 'dateDesc') {
+      filteredOperational.sort((a, b) => new Date(b.date) - new Date(a.date));
+    } else if (operationalSortOrder === 'dateAsc') {
+      filteredOperational.sort((a, b) => new Date(a.date) - new Date(b.date));
+    } else if (operationalSortOrder === 'highest') {
+      filteredOperational.sort((a, b) => b.amount - a.amount);
+    } else if (operationalSortOrder === 'lowest') {
+      filteredOperational.sort((a, b) => a.amount - b.amount);
+    } else if (operationalSortOrder === 'az') {
+      filteredOperational.sort((a, b) => a.description.localeCompare(b.description));
+    } else if (operationalSortOrder === 'za') {
+      filteredOperational.sort((a, b) => b.description.localeCompare(a.description));
+    }
+
+    const totalOperational = filteredOperational.reduce((sum, t) => sum + Number(t.amount), 0);
+
+    return (
+      <div className="space-y-8 max-w-[1100px]">
+        {/* Form Tambah Pengeluaran */}
+        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-6 rounded-[1.5rem] shadow-[var(--admin-shadow)] animate-fade-in-up">
+          <h3 className="text-[var(--admin-accent)] font-semibold flex items-center gap-2 mb-4"><FiPlus /> Tambah Pengeluaran Operasional (Luar Event)</h3>
+          <form onSubmit={handleAddOperationalExpense} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <input type="date" required value={newOperationalExpense.date} onChange={e => setNewOperationalExpense({ ...newOperationalExpense, date: e.target.value })} className="bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[#E79EA7] [color-scheme:dark]" />
+            <input type="text" required placeholder="Deskripsi (Cth: Beli Kamera)" value={newOperationalExpense.description} onChange={e => setNewOperationalExpense({ ...newOperationalExpense, description: e.target.value })} className="md:col-span-2 bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[#E79EA7]" />
+            <div className="relative w-full">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)] font-medium">Rp</span>
+              <input type="text" required placeholder="0" value={newOperationalExpense.amount} onChange={e => handleNumberInput(e.target.value, (val) => setNewOperationalExpense({ ...newOperationalExpense, amount: val }))} className="w-full bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-4 py-2.5 text-[var(--admin-text-main)] font-bold focus:outline-none focus:border-[#E79EA7]" />
+            </div>
+            <button type="submit" className="md:col-span-4 bg-[#C9868F] hover:bg-[var(--admin-accent)] text-[var(--admin-surface)] font-bold rounded-xl px-4 py-2.5 transition-colors flex items-center justify-center gap-2 mt-2">
+              <FiCheck /> Simpan Pengeluaran
+            </button>
+          </form>
+        </div>
+
+        {/* Tabel Daftar Pengeluaran */}
+        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-6 rounded-[1.5rem] shadow-[var(--admin-shadow)] animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+            <h3 className="text-[var(--admin-accent)] font-semibold flex items-center gap-2"><FiSearch /> Daftar Pengeluaran Operasional</h3>
+
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+              <div className="relative flex-1 w-full sm:w-64">
+                <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
+                <input
+                  type="text"
+                  placeholder="Cari deskripsi..."
+                  value={operationalSearchQuery}
+                  onChange={(e) => setOperationalSearchQuery(e.target.value)}
+                  className="w-full bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-4 py-2 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[#E79EA7] transition-colors"
+                />
+              </div>
+              <select
+                value={operationalSortOrder}
+                onChange={(e) => setOperationalSortOrder(e.target.value)}
+                className="w-full sm:w-auto bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl px-4 py-2 text-sm text-[var(--admin-text-main)] focus:outline-none focus:border-[#E79EA7] [&>option]:bg-[var(--admin-surface)]"
+              >
+                <option value="dateDesc">Tanggal (Terbaru)</option>
+                <option value="dateAsc">Tanggal (Terlama)</option>
+                <option value="highest">Nominal (Tertinggi)</option>
+                <option value="lowest">Nominal (Terendah)</option>
+                <option value="az">Deskripsi (A-Z)</option>
+                <option value="za">Deskripsi (Z-A)</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border border-[var(--admin-border)]">
+            <table className="w-full text-left border-collapse min-w-[500px]">
+              <thead>
+                <tr className="border-b border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-[var(--admin-text-muted)] text-sm">
+                  <th className="py-3 px-4 font-medium w-1/4">Tanggal</th>
+                  <th className="py-3 px-4 font-medium w-1/2">Deskripsi Item</th>
+                  <th className="py-3 px-4 font-medium text-right w-1/4">Nominal (Rp)</th>
+                  <th className="py-3 px-4 font-medium text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredOperational.length === 0 ? (
+                  <tr>
+                    <td colSpan="4" className="py-8 text-center text-[var(--admin-text-muted)] text-sm italic">Belum ada pengeluaran operasional.</td>
+                  </tr>
+                ) : (
+                  filteredOperational.map(exp => (
+                    <tr key={exp.id} className="border-b border-white/[0.02] hover:bg-[var(--admin-hover-bg)] transition-colors">
+                      <td className="py-3 px-4 text-sm text-[var(--admin-text-muted)]">{format(new Date(exp.date), 'dd MMM yyyy')}</td>
+                      <td className="py-3 px-4 text-sm text-[var(--admin-text-main)] font-medium">{exp.description}</td>
+                      <td className="py-3 px-4 text-sm font-bold text-[#D28A94] text-right">{formatIDR(exp.amount)}</td>
+                      <td className="py-3 px-4 text-center">
+                        <button onClick={() => setDeleteModal({ isOpen: true, type: 'operational', id: exp.id, title: 'Hapus Pengeluaran?', message: `Yakin menghapus operasional "${exp.description}"?` })} className="text-[var(--admin-text-muted)] hover:text-[#D28A94] transition-colors p-1" title="Hapus">
+                          <FiTrash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+              {filteredOperational.length > 0 && (
+                <tfoot>
+                  <tr className="bg-[var(--admin-hover-bg)] border-t-2 border-[#E79EA7]/20 sticky bottom-0">
+                    <td colSpan="2" className="py-4 px-4 text-sm text-[var(--admin-text-main)] font-bold text-right">TOTAL PENGELUARAN OPERASIONAL</td>
+                    <td className="py-4 px-4 text-sm font-bold text-[#D28A94] text-right">{formatIDR(totalOperational)}</td>
+                    <td className="py-4 px-4"></td>
+                  </tr>
+                </tfoot>
+              )}
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="relative">
       {loading && (
@@ -1190,6 +1399,7 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
       )}
 
       {activeSubTab === 'events' && renderEventsTab()}
+      {activeSubTab === 'operational' && renderOperationalTab()}
       {activeSubTab === 'recap' && renderRecapTab()}
       {activeSubTab === 'target' && renderTargetTab()}
 
@@ -1205,13 +1415,13 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
               {deleteModal.message}
             </p>
             <div className="flex justify-center gap-3">
-              <button 
+              <button
                 onClick={() => setDeleteModal({ isOpen: false, type: '', id: null, title: '', message: '' })}
                 className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold text-[var(--admin-text-muted)] hover:text-[var(--admin-text-main)] hover:bg-[var(--admin-input-bg)] transition-colors"
               >
                 Batal
               </button>
-              <button 
+              <button
                 onClick={() => {
                   if (deleteModal.type === 'event') {
                     executeDeleteEvent(deleteModal.id);
@@ -1219,6 +1429,8 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
                     executeDeleteTransaction(deleteModal.id);
                   } else if (deleteModal.type === 'custom_target') {
                     handleDeleteCustomTarget(deleteModal.id);
+                  } else if (deleteModal.type === 'operational') {
+                    handleDeleteOperationalExpense(deleteModal.id);
                   }
                   setDeleteModal({ isOpen: false, type: '', id: null, title: '', message: '' });
                 }}

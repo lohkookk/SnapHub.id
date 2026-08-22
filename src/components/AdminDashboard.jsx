@@ -47,6 +47,7 @@ const AdminDashboard = () => {
       let targetAllTime = 0;
       let targetMonthly = 0;
       let customTargets = [];
+      let operationalExpenses = [];
 
       if (settingsData) {
         const t = {};
@@ -60,6 +61,12 @@ const AdminDashboard = () => {
           try {
             customTargets = JSON.parse(t['custom_targets']);
           } catch (e) { }
+        }
+        
+        if (t['operational_expenses']) {
+          try {
+            operationalExpenses = JSON.parse(t['operational_expenses']);
+          } catch(e) {}
         }
       }
       setTargets({ allTime: targetAllTime, monthly: targetMonthly, custom: customTargets });
@@ -100,6 +107,11 @@ const AdminDashboard = () => {
         transactions.forEach(t => {
           if (t.type === 'event_expense') eventExpense += Number(t.amount);
         });
+        
+        let totalOperationalExpense = 0;
+        operationalExpenses.forEach(t => {
+          totalOperationalExpense += Number(t.amount);
+        });
 
         events.forEach(ev => {
           if (ev.date && ev.date.startsWith(currentMonthStr)) {
@@ -107,9 +119,13 @@ const AdminDashboard = () => {
             thisMonthNetProfit += (Number(ev.income) - evExpenses);
           }
         });
+        
+        // Deduct this month's operational expenses
+        const thisMonthOperational = operationalExpenses.filter(t => t.date && t.date.startsWith(currentMonthStr)).reduce((sum, t) => sum + Number(t.amount), 0);
+        thisMonthNetProfit -= thisMonthOperational;
       }
 
-      const netProfit = eventIncome - eventExpense;
+      const netProfit = eventIncome - eventExpense - (events && transactions ? operationalExpenses.reduce((sum, t) => sum + Number(t.amount), 0) : 0);
 
       // Calculations for insights
       const totalEvents = events ? events.length : 0;
@@ -142,6 +158,7 @@ const AdminDashboard = () => {
       setStats({
         totalEventIncome: eventIncome,
         totalEventExpense: eventExpense,
+        totalOperationalExpense: events && transactions ? operationalExpenses.reduce((sum, t) => sum + Number(t.amount), 0) : 0,
         netProfit: netProfit
       });
 
@@ -217,34 +234,61 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-4 font-sans max-w-[1100px]">
 
-      {/* Top Hero Card */}
-      <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[1.5rem] p-6 md:p-8 shadow-[var(--admin-shadow)]">
-        <div className="flex flex-col md:flex-row justify-between md:items-start gap-6">
-          <div>
-            <p className="text-[var(--admin-text-muted)] text-[0.9rem] font-medium tracking-wide">Total Laba Bersih</p>
-            <h2 className="text-4xl md:text-[2.75rem] font-bold text-[var(--admin-accent)] mt-1.5 leading-tight">{formatIDR(stats.netProfit)}</h2>
-            <p className="text-[var(--admin-text-muted)] text-xs mt-2">dari seluruh event & transaksi</p>
-          </div>
-          <div className="flex flex-col gap-5 md:text-right">
-            <div>
-              <p className="text-[var(--admin-text-muted)] text-[0.9rem] font-medium tracking-wide">Total Pemasukan Event</p>
-              <div className="flex items-center md:justify-end gap-1.5 text-[#64D194] mt-1">
-                <FiTrendingUp size={18} />
-                <span className="text-xl font-bold">{formatIDR(stats.totalEventIncome)}</span>
-              </div>
-            </div>
-            <div>
-              <p className="text-[var(--admin-text-muted)] text-[0.9rem] font-medium tracking-wide">Total Pengeluaran Event</p>
-              <div className="flex items-center md:justify-end gap-1.5 text-[#D28A94] mt-1">
-                <FiArrowUpRight size={18} />
-                <span className="text-xl font-bold">{formatIDR(stats.totalEventExpense)}</span>
-              </div>
-            </div>
+      {/* Top Hero & Financial Summary */}
+      <div className="space-y-6">
+        
+        {/* Main Net Profit Card */}
+        <div className="bg-gradient-to-br from-[#2D1B1E] to-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[1.5rem] p-6 md:p-8 shadow-[var(--admin-shadow)] relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#E79EA7]/5 rounded-full blur-[80px] pointer-events-none group-hover:bg-[#E79EA7]/10 transition-colors duration-1000" />
+          
+          <div className="relative z-10">
+            <p className="text-[var(--admin-text-muted)] text-[0.95rem] font-semibold tracking-wider uppercase mb-1">Total Laba Bersih</p>
+            <h2 className="text-4xl md:text-[3.25rem] font-extrabold text-[var(--admin-accent)] mt-2 leading-tight drop-shadow-md">
+              {formatIDR(stats.netProfit)}
+            </h2>
+            <p className="text-[#E79EA7]/60 text-sm mt-3 font-medium">Akumulasi dari seluruh event & operasional bisnis</p>
           </div>
         </div>
 
-        {/* Target Progress Bars */}
-        <div className="mt-10 space-y-6">
+        {/* Sub Metrics Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[1.25rem] p-5 hover:border-[#64D194]/30 hover:shadow-[0_4px_20px_rgba(100,209,148,0.05)] transition-all duration-300">
+            <p className="text-[var(--admin-text-muted)] text-sm font-medium tracking-wide mb-3 flex items-center gap-2">
+              <span className="w-8 h-8 rounded-lg bg-[#64D194]/10 flex items-center justify-center text-[#64D194]">
+                <FiTrendingUp size={16} />
+              </span>
+              Pemasukan Event
+            </p>
+            <span className="text-2xl font-bold text-[#64D194]">{formatIDR(stats.totalEventIncome)}</span>
+          </div>
+
+          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[1.25rem] p-5 hover:border-[#D28A94]/30 hover:shadow-[0_4px_20px_rgba(210,138,148,0.05)] transition-all duration-300">
+            <p className="text-[var(--admin-text-muted)] text-sm font-medium tracking-wide mb-3 flex items-center gap-2">
+              <span className="w-8 h-8 rounded-lg bg-[#D28A94]/10 flex items-center justify-center text-[#D28A94]">
+                <FiArrowUpRight size={16} />
+              </span>
+              Pengeluaran Event
+            </p>
+            <span className="text-2xl font-bold text-[#D28A94]">{formatIDR(stats.totalEventExpense)}</span>
+          </div>
+
+          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[1.25rem] p-5 hover:border-[#D28A94]/30 hover:shadow-[0_4px_20px_rgba(210,138,148,0.05)] transition-all duration-300">
+            <p className="text-[var(--admin-text-muted)] text-sm font-medium tracking-wide mb-3 flex items-center gap-2">
+              <span className="w-8 h-8 rounded-lg bg-[#D28A94]/10 flex items-center justify-center text-[#D28A94]">
+                <FiArrowUpRight size={16} />
+              </span>
+              Pengeluaran Operasional
+            </p>
+            <span className="text-2xl font-bold text-[#D28A94]">{formatIDR(stats.totalOperationalExpense || 0)}</span>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* Target Progress Bars */}
+      <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[1.5rem] p-6 md:p-8 shadow-[var(--admin-shadow)] space-y-6 mt-6">
 
           {/* Target Keseluruhan */}
           {targets.allTime > 0 && (
@@ -324,7 +368,6 @@ const AdminDashboard = () => {
             </div>
           )}
         </div>
-      </div>
 
       {/* Mini Cards (Statistik Bisnis) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
