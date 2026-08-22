@@ -41,10 +41,10 @@ const BookingCalendar = () => {
 
       const isPast = date < new Date(new Date().setHours(0, 0, 0, 0));
       const isTooClose = !isPast && date < minBookableDate;
-      
+
       if (isPast) return 'past-date relative';
       if (isTooClose) return 'too-close-date relative group';
-      
+
       return 'relative cursor-pointer group';
     }
     return null;
@@ -118,7 +118,7 @@ const BookingCalendar = () => {
                     } else if (isTooClose) {
                       return (
                         <div className="calendar-tooltip bg-[#FFAA00] shadow-lg text-black font-semibold">
-                          H-7 Closed
+                          H-7 Not Available
                         </div>
                       );
                     } else if (!isPast && !isTooClose) {
@@ -146,7 +146,7 @@ const BookingCalendar = () => {
                     <div className="w-5 h-5 rounded-md flex items-center justify-center bg-[#FFAA00]/10 border border-[#FFAA00]/20">
                       <span className="text-[#FFAA00]/80 text-[10px] font-medium">02</span>
                     </div>
-                    <span className="font-medium">Closed (H-7)</span>
+                    <span className="font-medium">Not Available (H-7) </span>
                   </div>
                   <div className="flex items-center gap-2.5">
                     <div className="w-5 h-5 rounded-md flex items-center justify-center"
