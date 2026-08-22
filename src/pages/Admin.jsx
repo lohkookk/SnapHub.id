@@ -21,6 +21,7 @@ const Admin = () => {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFinanceOpen, setIsFinanceOpen] = useState(true);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('adminTheme') || 'dark');
 
   useEffect(() => {
@@ -185,6 +186,36 @@ const Admin = () => {
     <div className="min-h-screen bg-[var(--admin-bg)] text-[var(--admin-text-main)] flex overflow-hidden transition-colors duration-300" data-theme={theme}>
       <Toaster position="top-center" toastOptions={{ style: { background: '#333', color: '#fff' } }} />
 
+      {/* Logout Modal */}
+      {isLogoutModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsLogoutModalOpen(false)}></div>
+          <div className="relative bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-2xl p-6 w-full max-w-sm shadow-2xl animate-fade-in-up">
+            <h3 className="text-xl font-bold text-[var(--admin-accent)] mb-2">Konfirmasi Logout</h3>
+            <p className="text-[var(--admin-text-muted)] text-sm mb-6">
+              Apakah Anda yakin ingin keluar dari sesi Admin?
+            </p>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setIsLogoutModalOpen(false)}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-[var(--admin-border)] text-[var(--admin-text-main)] hover:bg-[var(--admin-hover-bg)] transition-colors font-medium text-sm cursor-pointer"
+              >
+                Batal
+              </button>
+              <button 
+                onClick={() => {
+                  setIsLogoutModalOpen(false);
+                  handleLogout();
+                }}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white transition-colors font-medium text-sm border border-red-500 cursor-pointer"
+              >
+                Ya, Keluar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
@@ -267,7 +298,7 @@ const Admin = () => {
           <Link to="/" className="w-full flex items-center justify-center gap-2 bg-[var(--admin-hover-bg)] hover:border-[var(--admin-border)] border border-transparent text-[var(--admin-text-main)] px-4 py-3 rounded-xl transition-all text-sm font-medium group">
             <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" /> Kembali ke Website
           </Link>
-          <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-[var(--admin-hover-bg)] hover:bg-[var(--admin-accent)] hover:text-white text-[var(--admin-text-main)] px-4 py-3 rounded-xl transition-colors text-sm font-medium">
+          <button onClick={() => setIsLogoutModalOpen(true)} className="w-full flex items-center justify-center gap-2 bg-[var(--admin-hover-bg)] hover:bg-red-500 hover:border-red-500 border border-transparent hover:text-white text-[var(--admin-text-main)] px-4 py-3 rounded-xl transition-colors text-sm font-medium cursor-pointer">
             <FiLogOut /> Logout
           </button>
         </div>

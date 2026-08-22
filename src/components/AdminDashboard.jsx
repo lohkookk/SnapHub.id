@@ -22,7 +22,11 @@ const AdminDashboard = () => {
   });
   const [chartData, setChartData] = useState([]);
   const [pieData, setPieData] = useState([]);
-  const [targetKeuntungan, setTargetKeuntungan] = useState(10000000);
+  const [targets, setTargets] = useState({
+    allTime: 0,
+    monthly: 0,
+    custom: []
+  });
   const [upcomingSchedules, setUpcomingSchedules] = useState([]);
   const [pastSchedules, setPastSchedules] = useState([]);
 
@@ -35,22 +39,30 @@ const AdminDashboard = () => {
     try {
       const { data: events } = await supabase.from('financial_events').select('*').order('date', { ascending: true });
       const { data: transactions } = await supabase.from('transactions').select('*');
-      const { data: settingsData } = await supabase.from('settings').select('*').like('key', 'target_keuntungan%');
+      const { data: settingsData } = await supabase.from('settings').select('*');
       const { data: schedules } = await supabase.from('booked_dates').select('*').order('date', { ascending: true });
-      
+
       const currentMonthStr = format(new Date(), 'yyyy-MM');
 
+      let targetAllTime = 0;
+      let targetMonthly = 0;
+      let customTargets = [];
+
       if (settingsData) {
-        const targets = {};
-        settingsData.forEach(t => targets[t.key] = t.value);
-        
-        const currentKey = `target_keuntungan_${currentMonthStr}`;
-        if (targets[currentKey]) {
-          setTargetKeuntungan(Number(targets[currentKey]));
-        } else if (targets['target_keuntungan']) {
-          setTargetKeuntungan(Number(targets['target_keuntungan']));
+        const t = {};
+        settingsData.forEach(item => t[item.key] = item.value);
+
+        if (t['target_all_time']) targetAllTime = Number(t['target_all_time']);
+        if (t[`target_keuntungan_${currentMonthStr}`]) targetMonthly = Number(t[`target_keuntungan_${currentMonthStr}`]);
+        else if (t['target_keuntungan']) targetMonthly = Number(t['target_keuntungan']);
+
+        if (t['custom_targets']) {
+          try {
+            customTargets = JSON.parse(t['custom_targets']);
+          } catch (e) { }
         }
       }
+      setTargets({ allTime: targetAllTime, monthly: targetMonthly, custom: customTargets });
 
       let unifiedSchedules = [];
       if (schedules) {
@@ -68,9 +80,9 @@ const AdminDashboard = () => {
       }
 
       if (unifiedSchedules.length > 0) {
-        const today = new Date(new Date().setHours(0,0,0,0));
-        const upcoming = unifiedSchedules.filter(d => new Date(d.date) >= today).sort((a,b) => new Date(a.date) - new Date(b.date));
-        const past = unifiedSchedules.filter(d => new Date(d.date) < today).sort((a,b) => new Date(b.date) - new Date(a.date));
+        const today = new Date(new Date().setHours(0, 0, 0, 0));
+        const upcoming = unifiedSchedules.filter(d => new Date(d.date) >= today).sort((a, b) => new Date(a.date) - new Date(b.date));
+        const past = unifiedSchedules.filter(d => new Date(d.date) < today).sort((a, b) => new Date(b.date) - new Date(a.date));
         setUpcomingSchedules(upcoming);
         setPastSchedules(past);
       } else {
@@ -84,7 +96,7 @@ const AdminDashboard = () => {
 
       if (events && transactions) {
         eventIncome = events.reduce((acc, curr) => acc + Number(curr.income), 0);
-        
+
         transactions.forEach(t => {
           if (t.type === 'event_expense') eventExpense += Number(t.amount);
         });
@@ -103,7 +115,7 @@ const AdminDashboard = () => {
       const totalEvents = events ? events.length : 0;
       let topEventName = '-';
       let topEventProfit = 0;
-      
+
       if (events && transactions) {
         events.forEach(ev => {
           const evExpenses = transactions.filter(t => t.event_id === ev.id).reduce((sum, t) => sum + Number(t.amount), 0);
@@ -143,7 +155,7 @@ const AdminDashboard = () => {
             Pengeluaran: evExpenses
           };
         }).slice(-7); // Last 7 events
-        
+
         setChartData(dataForChart);
       }
 
@@ -155,10 +167,10 @@ const AdminDashboard = () => {
           const displayDesc = desc.charAt(0).toUpperCase() + desc.slice(1);
           expenseMap[displayDesc] = (expenseMap[displayDesc] || 0) + Number(t.amount);
         });
-        
+
         let pieArr = Object.keys(expenseMap).map(key => ({ name: key, value: expenseMap[key] }));
-        pieArr.sort((a,b) => b.value - a.value); // Sort descending
-        
+        pieArr.sort((a, b) => b.value - a.value); // Sort descending
+
         if (pieArr.length > 4) {
           const top4 = pieArr.slice(0, 4);
           const othersValue = pieArr.slice(4).reduce((sum, curr) => sum + curr.value, 0);
@@ -166,7 +178,7 @@ const AdminDashboard = () => {
         } else if (pieArr.length === 0) {
           pieArr = [{ name: 'Belum Ada', value: 1 }];
         }
-        
+
         setPieData(pieArr);
       }
 
@@ -189,15 +201,22 @@ const AdminDashboard = () => {
     );
   }
 
-  const tercapai = Math.max(0, Math.min(((insightStats.thisMonthNetProfit || 0) / targetKeuntungan) * 100, 100));
   const PIE_COLORS = ['#D28A94', '#64D194', '#E79EA7', '#8E7B7D', '#6E3A42'];
-  
+
   const todayDate = new Date();
   const daysLeft = getDaysInMonth(todayDate) - getDate(todayDate);
 
+  const allTimeTarget = targets.allTime || 1;
+  const allTimeTercapaiRaw = Math.max(0, ((stats.netProfit || 0) / allTimeTarget) * 100);
+  const allTimeTercapaiWidth = Math.min(allTimeTercapaiRaw, 100);
+
+  const monthlyTarget = targets.monthly || 1;
+  const monthlyTercapaiRaw = Math.max(0, ((insightStats.thisMonthNetProfit || 0) / monthlyTarget) * 100);
+  const monthlyTercapaiWidth = Math.min(monthlyTercapaiRaw, 100);
+
   return (
     <div className="space-y-4 font-sans max-w-[1100px]">
-      
+
       {/* Top Hero Card */}
       <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] rounded-[1.5rem] p-6 md:p-8 shadow-[var(--admin-shadow)]">
         <div className="flex flex-col md:flex-row justify-between md:items-start gap-6">
@@ -224,24 +243,86 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Target Progress Bar */}
-        <div className="mt-10">
-          <div className="flex justify-between items-center text-[var(--admin-accent)] mb-3">
-            <span className="flex items-center gap-2 text-sm font-semibold"><FiTarget size={16} /> Target Bulanan</span>
-            <div className="text-right">
-              <div className="text-sm font-bold">{formatIDR(targetKeuntungan)}</div>
-              <div className="text-[var(--admin-text-muted)] text-xs font-normal mt-0.5">Sisa {daysLeft} hari lagi bulan ini</div>
+        {/* Target Progress Bars */}
+        <div className="mt-10 space-y-6">
+
+          {/* Target Keseluruhan */}
+          {targets.allTime > 0 && (
+            <div>
+              <div className="flex justify-between items-center text-[var(--admin-accent)] mb-2">
+                <span className="flex items-center gap-2 text-sm font-semibold"><FiTarget size={16} /> Target Keseluruhan Bisnis</span>
+                <div className="text-right">
+                  <div className="text-sm font-bold">{formatIDR(targets.allTime)}</div>
+                </div>
+              </div>
+              <div className="h-4 w-full bg-[var(--admin-hover-bg)] rounded-full overflow-hidden border border-[var(--admin-border-subtle)]">
+                <div className="h-full bg-gradient-to-r from-[#6E3A42] to-[#C9868F] rounded-full transition-all duration-1000 relative" style={{ width: `${allTimeTercapaiWidth}%` }}>
+                  <div className="absolute inset-0 bg-white/10 w-full h-full" />
+                </div>
+              </div>
+              <div className="flex justify-between mt-1.5 text-xs text-[var(--admin-text-muted)] font-medium">
+                <span>Terkumpul: {formatIDR(stats.netProfit)}</span>
+                <span className={allTimeTercapaiRaw >= 100 ? 'text-[#64D194]' : ''}>{allTimeTercapaiRaw.toFixed(1)}% Tercapai</span>
+              </div>
             </div>
-          </div>
-          <div className="h-4 w-full bg-[var(--admin-hover-bg)] rounded-full overflow-hidden border border-[var(--admin-border)]">
-            <div className="h-full bg-gradient-to-r from-[#6E3A42] to-[#C9868F] rounded-full transition-all duration-1000 relative" style={{ width: `${tercapai}%` }}>
-              <div className="absolute inset-0 bg-white/10 w-full h-full" />
+          )}
+
+          {/* Target Bulanan */}
+          {targets.monthly > 0 && (
+            <div>
+              <div className="flex justify-between items-center text-[var(--admin-accent)] mb-2">
+                <span className="flex items-center gap-2 text-sm font-semibold"><FiCalendar size={16} /> Target Bulan Ini</span>
+                <div className="text-right">
+                  <div className="text-sm font-bold">{formatIDR(targets.monthly)}</div>
+                  <div className="text-[var(--admin-text-muted)] text-[10px] font-normal mt-0.5">Sisa {daysLeft} hari lagi</div>
+                </div>
+              </div>
+              <div className="h-4 w-full bg-[var(--admin-hover-bg)] rounded-full overflow-hidden border border-[var(--admin-border-subtle)]">
+                <div className="h-full bg-gradient-to-r from-[#8E7B7D] to-[#D28A94] rounded-full transition-all duration-1000 relative" style={{ width: `${monthlyTercapaiWidth}%` }}>
+                  <div className="absolute inset-0 bg-white/10 w-full h-full" />
+                </div>
+              </div>
+              <div className="flex justify-between mt-1.5 text-xs text-[var(--admin-text-muted)] font-medium">
+                <span>Terkumpul: {formatIDR(insightStats.thisMonthNetProfit)}</span>
+                <span className={monthlyTercapaiRaw >= 100 ? 'text-[#64D194]' : ''}>{monthlyTercapaiRaw.toFixed(1)}% Tercapai</span>
+              </div>
             </div>
-          </div>
-          <div className="flex justify-between mt-2.5 text-xs text-[var(--admin-text-muted)] font-medium">
-            <span>Terkumpul: {formatIDR(insightStats.thisMonthNetProfit || 0)}</span>
-            <span>{tercapai.toFixed(1)}% Tercapai</span>
-          </div>
+          )}
+
+          {/* Target Kustom */}
+          {targets.custom && targets.custom.length > 0 && (
+            <div className="pt-4 border-t border-[var(--admin-border-subtle)] space-y-4">
+              <h4 className="text-sm font-semibold text-[var(--admin-text-main)] flex items-center gap-2"><FiStar className="text-[var(--admin-accent)]" /> Target Impian</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {targets.custom.map(target => {
+                  const cTercapaiRaw = Math.max(0, (stats.netProfit / target.amount) * 100);
+                  const cTercapaiWidth = Math.min(cTercapaiRaw, 100);
+                  const isDone = cTercapaiRaw >= 100;
+                  return (
+                    <div key={target.id} className="bg-[var(--admin-input-bg)] p-4 rounded-xl border border-[var(--admin-border-subtle)]">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className={`text-sm font-medium ${isDone ? 'text-[#64D194]' : 'text-[var(--admin-text-main)]'}`}>{target.name}</span>
+                        <span className="text-xs font-bold text-[var(--admin-text-muted)]">{formatIDR(target.amount)}</span>
+                      </div>
+                      <div className="h-2 w-full bg-[var(--admin-hover-bg)] rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full transition-all duration-1000 ${isDone ? 'bg-[#64D194]' : 'bg-[#D28A94]'}`} style={{ width: `${cTercapaiWidth}%` }} />
+                      </div>
+                      <div className="mt-2 flex justify-between items-center text-[11px] text-[var(--admin-text-muted)]">
+                        <span>Terkumpul: <span className="font-medium text-[var(--admin-text-main)]">{formatIDR(stats.netProfit)}</span></span>
+                        <span className={isDone ? 'text-[#64D194] font-medium' : ''}>{cTercapaiRaw.toFixed(1)}%</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {!targets.allTime && !targets.monthly && (!targets.custom || targets.custom.length === 0) && (
+            <div className="text-center py-6 border border-dashed border-[var(--admin-border-subtle)] rounded-xl text-[var(--admin-text-muted)] text-sm">
+              Belum ada target yang diatur. Buka menu <b>Event & Keuangan</b> untuk mengatur target.
+            </div>
+          )}
         </div>
       </div>
 
@@ -302,8 +383,8 @@ const AdminDashboard = () => {
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-border)" vertical={false} />
                 <XAxis dataKey="name" stroke="var(--admin-text-muted)" fontSize={11} tickLine={false} axisLine={false} dy={10} />
-                <YAxis stroke="var(--admin-text-muted)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `${val/1000000}jt`} />
-                <Tooltip 
+                <YAxis stroke="var(--admin-text-muted)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `${val / 1000000}jt`} />
+                <Tooltip
                   contentStyle={{ backgroundColor: 'var(--admin-surface)', border: '1px solid var(--admin-border)', borderRadius: '12px', color: 'var(--admin-accent)' }}
                   itemStyle={{ color: 'var(--admin-accent)', fontSize: '13px' }}
                   labelStyle={{ color: 'var(--admin-text-muted)', fontSize: '12px', marginBottom: '4px' }}
@@ -338,7 +419,7 @@ const AdminDashboard = () => {
                     <Cell key={`cell-${index}`} fill={entry.name === 'Belum Ada' ? '#29181A' : PIE_COLORS[index % PIE_COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip 
+                <Tooltip
                   formatter={(value) => formatIDR(value)}
                   contentStyle={{ backgroundColor: 'var(--admin-surface)', border: '1px solid var(--admin-border)', borderRadius: '12px', fontSize: '13px' }}
                   itemStyle={{ color: 'var(--admin-accent)' }}
@@ -349,7 +430,7 @@ const AdminDashboard = () => {
             <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4 w-full justify-center text-[10px] text-[var(--admin-text-muted)]">
               {pieData.map((entry, idx) => (
                 <div key={idx} className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.name === 'Belum Ada' ? '#29181A' : PIE_COLORS[idx % PIE_COLORS.length] }} /> 
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.name === 'Belum Ada' ? '#29181A' : PIE_COLORS[idx % PIE_COLORS.length] }} />
                   {entry.name}
                 </div>
               ))}

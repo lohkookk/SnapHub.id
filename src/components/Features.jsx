@@ -3,14 +3,14 @@ import { motion, useInView } from 'framer-motion';
 import { FiCamera, FiStar, FiPrinter, FiImage, FiLayout, FiUsers, FiGift, FiZap, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 const FEATURES = [
-  { icon: <FiCamera />,  title: 'Unlimited Photos',  desc: 'Snap as many as you want — no limits, just endless fun and perfect shots every time.' },
-  { icon: <FiStar />,    title: 'High Resolution',   desc: 'Every shot captured in stunning 4K for crystal-clear, gallery-quality prints.' },
-  { icon: <FiPrinter />, title: 'Instant Print',     desc: 'Professional-grade prints delivered in seconds — hold your memories right away.' },
-  { icon: <FiImage />,   title: 'Digital Gallery',   desc: 'All photos instantly uploaded to a private online gallery, shareable with everyone.' },
-  { icon: <FiLayout />,  title: 'Custom Template',   desc: 'Personalized frames designed to perfectly match your event theme and branding.' },
-  { icon: <FiUsers />,   title: 'Professional Team', desc: 'Experienced crew guides your guests and ensures seamless, flawless operation.' },
-  { icon: <FiGift />,    title: 'Premium Props',     desc: 'Curated luxury props and accessories to spark creativity and unforgettable fun.' },
-  { icon: <FiZap />,     title: 'Fast Setup',        desc: 'We handle everything — arrive early, set up fast, so you can focus on your event.' },
+  { icon: <FiCamera />,  title: 'Unlimited Photos',  desc: 'Foto sebanyak yang Anda inginkan — tanpa batasan, keseruan tiada henti dan hasil sempurna setiap saat.' },
+  { icon: <FiStar />,    title: 'High Resolution',   desc: 'Setiap jepretan ditangkap dalam resolusi 4K yang memukau untuk hasil cetak sejernih kristal layaknya galeri.' },
+  { icon: <FiPrinter />, title: 'Instant Print',     desc: 'Hasil cetak berkualitas profesional dalam hitungan detik — kenangan langsung ada di genggaman Anda.' },
+  { icon: <FiImage />,   title: 'Digital Gallery',   desc: 'Semua foto langsung diunggah ke galeri online pribadi dan mudah dibagikan ke semua orang.' },
+  { icon: <FiLayout />,  title: 'Custom Template',   desc: 'Desain bingkai khusus yang disesuaikan secara sempurna dengan tema dan nuansa acara Anda.' },
+  { icon: <FiUsers />,   title: 'Professional Team', desc: 'Kru berpengalaman kami akan memandu tamu Anda untuk memastikan kelancaran dan keseruan acara.' },
+  { icon: <FiGift />,    title: 'Premium Props',     desc: 'Koleksi properti dan aksesoris berkelas yang sudah dikurasi untuk memicu kreativitas dan keseruan.' },
+  { icon: <FiZap />,     title: 'Fast Setup',        desc: 'Kami tangani semuanya — datang lebih awal, persiapan cepat, agar Anda bisa fokus pada acara Anda.' },
 ];
 
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.07 } } };
@@ -65,7 +65,7 @@ const Features = () => {
             transition={{ duration: 0.65, delay: 0.2 }}
             className="section-desc"
           >
-            Premium features designed to make your event unforgettable and every photo exceptional.
+            Fitur-fitur premium yang dirancang untuk membuat acara Anda tak terlupakan dan setiap foto menjadi luar biasa.
           </motion.p>
         </div>
 

@@ -88,13 +88,10 @@ const About = () => {
 
             {/* Body */}
             <motion.p variants={fadeUp} className="text-gray-400 text-[0.95rem] leading-[1.85] mb-4">
-              SnapHub is a premium photobooth service provider dedicated to transforming your
-              special occasions into unforgettable visual stories. We combine cutting-edge
-              technology with artistic excellence to deliver an experience beyond just photos.
+              SnapHub adalah penyedia layanan photobooth premium yang berdedikasi mengabadikan momen istimewa Anda menjadi kisah visual yang tak terlupakan. Melalui perpaduan teknologi mutakhir dan keunggulan artistik, kami menghadirkan pengalaman yang melampaui sekadar pengambilan foto.
             </motion.p>
             <motion.p variants={fadeUp} className="text-gray-400 text-[0.95rem] leading-[1.85] mb-9">
-              From intimate weddings to grand corporate events, our professional team ensures
-              every smile is captured with precision, elegance, and heart.
+              Mulai dari acara perusahaan berskala besar hingga pernikahan yang intim, tim profesional kami memastikan setiap senyuman diabadikan dengan presisi, keanggunan, dan ketulusan hati.
             </motion.p>
 
             {/* Badges */}

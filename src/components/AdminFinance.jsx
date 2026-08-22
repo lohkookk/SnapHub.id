@@ -26,10 +26,15 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
   const [inputPassword, setInputPassword] = useState('');
 
   // Target State
+  const [targetAllTime, setTargetAllTime] = useState('0');
   const [targetKeuntungan, setTargetKeuntungan] = useState('10.000.000');
   const [targetMonth, setTargetMonth] = useState(format(new Date(), 'yyyy-MM'));
+  const [customTargets, setCustomTargets] = useState([]);
   const [allTargets, setAllTargets] = useState({});
   const [isUpdatingTarget, setIsUpdatingTarget] = useState(false);
+  const [newCustomTarget, setNewCustomTarget] = useState({ name: '', amount: '' });
+  const [isEditingAllTime, setIsEditingAllTime] = useState(false);
+  const [isEditingMonthly, setIsEditingMonthly] = useState(false);
 
   // Forms State
   const [newEvent, setNewEvent] = useState({ name: '', date: '' });
@@ -59,17 +64,29 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
       const { data: trxData, error: e2 } = await supabase.from('transactions').select('*').order('date', { ascending: false });
       if (e2) throw e2;
 
-      const { data: settingsData, error: e3 } = await supabase.from('settings').select('*').like('key', 'target_keuntungan%');
+      const { data: settingsData, error: e3 } = await supabase.from('settings').select('*');
       if (settingsData) {
         const targets = {};
         settingsData.forEach(t => targets[t.key] = t.value);
         setAllTargets(targets);
+        
+        if (targets['target_all_time']) {
+          setTargetAllTime(new Intl.NumberFormat('id-ID').format(targets['target_all_time']));
+        }
         
         const currentKey = `target_keuntungan_${format(new Date(), 'yyyy-MM')}`;
         if (targets[currentKey]) {
           setTargetKeuntungan(new Intl.NumberFormat('id-ID').format(targets[currentKey]));
         } else if (targets['target_keuntungan']) {
           setTargetKeuntungan(new Intl.NumberFormat('id-ID').format(targets['target_keuntungan']));
+        }
+
+        if (targets['custom_targets']) {
+          try {
+            setCustomTargets(JSON.parse(targets['custom_targets']));
+          } catch(e) {
+            setCustomTargets([]);
+          }
         }
       }
 
@@ -88,7 +105,23 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
     }
   };
 
-  const handleUpdateTarget = async (e) => {
+  const handleUpdateAllTime = async (e) => {
+    e.preventDefault();
+    setIsUpdatingTarget(true);
+    try {
+      const { error } = await supabase.from('settings').upsert({ key: 'target_all_time', value: getRawNumber(targetAllTime) }, { onConflict: 'key' });
+      if (error) throw error;
+      toast.success('Target Keseluruhan berhasil diperbarui!');
+      setIsEditingAllTime(false);
+      fetchData();
+    } catch (error) {
+      toast.error('Gagal memperbarui target');
+    } finally {
+      setIsUpdatingTarget(false);
+    }
+  };
+
+  const handleUpdateMonthly = async (e) => {
     e.preventDefault();
     setIsUpdatingTarget(true);
     const key = `target_keuntungan_${targetMonth}`;
@@ -96,9 +129,52 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
       const { error } = await supabase.from('settings').upsert({ key: key, value: getRawNumber(targetKeuntungan) }, { onConflict: 'key' });
       if (error) throw error;
       toast.success(`Target untuk bulan ${format(new Date(targetMonth + '-01'), 'MMMM yyyy')} berhasil diperbarui!`);
+      setIsEditingMonthly(false);
       fetchData();
     } catch (error) {
       toast.error('Gagal memperbarui target');
+    } finally {
+      setIsUpdatingTarget(false);
+    }
+  };
+
+  const handleAddCustomTarget = async (e) => {
+    e.preventDefault();
+    if (!newCustomTarget.name || !newCustomTarget.amount) return;
+    
+    setIsUpdatingTarget(true);
+    try {
+      const newTarget = {
+        id: Date.now().toString(),
+        name: newCustomTarget.name,
+        amount: getRawNumber(newCustomTarget.amount)
+      };
+      const updatedList = [...customTargets, newTarget];
+      
+      const { error } = await supabase.from('settings').upsert({ key: 'custom_targets', value: JSON.stringify(updatedList) }, { onConflict: 'key' });
+      if (error) throw error;
+      
+      setCustomTargets(updatedList);
+      setNewCustomTarget({ name: '', amount: '' });
+      toast.success('Target Kustom berhasil ditambahkan!');
+    } catch (error) {
+      toast.error('Gagal menambah target kustom');
+    } finally {
+      setIsUpdatingTarget(false);
+    }
+  };
+
+  const handleDeleteCustomTarget = async (id) => {
+    setIsUpdatingTarget(true);
+    try {
+      const updatedList = customTargets.filter(t => t.id !== id);
+      const { error } = await supabase.from('settings').upsert({ key: 'custom_targets', value: JSON.stringify(updatedList) }, { onConflict: 'key' });
+      if (error) throw error;
+      
+      setCustomTargets(updatedList);
+      toast.success('Target Kustom berhasil dihapus!');
+    } catch (error) {
+      toast.error('Gagal menghapus target kustom');
     } finally {
       setIsUpdatingTarget(false);
     }
@@ -948,10 +1024,6 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
   };
 
   const renderTargetTab = () => {
-    const totalSemuaPemasukan = events.reduce((sum, ev) => sum + Number(ev.income), 0);
-    const totalSemuaPengeluaran = transactions.filter(t => t.type === 'event_expense').reduce((sum, t) => sum + Number(t.amount), 0);
-    const totalSemuaLaba = totalSemuaPemasukan - totalSemuaPengeluaran;
-
     // Hitung Monthly Stats
     const monthlyStats = {};
     events.forEach(ev => {
@@ -969,24 +1041,64 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
 
     return (
       <div className="space-y-8 max-w-[1100px]">
-        {/* Form Target Bulanan */}
-        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-6 rounded-[1.5rem] shadow-[var(--admin-shadow)]">
-          <h3 className="text-[var(--admin-accent)] font-semibold mb-4 flex items-center gap-2"><FiTarget /> Pengaturan Target Bulanan</h3>
-          <form onSubmit={handleUpdateTarget} className="flex flex-col sm:flex-row gap-4">
-            <input type="month" required value={targetMonth} onChange={e => setTargetMonth(e.target.value)} className="bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[#E79EA7] [color-scheme:dark]" />
-            <div className="relative flex-1 max-w-sm">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)] font-medium">Rp</span>
-              <input type="text" required value={targetKeuntungan} onChange={e => handleNumberInput(e.target.value, setTargetKeuntungan)} className="w-full bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-4 py-2.5 text-[var(--admin-text-main)] font-bold focus:outline-none focus:border-[#E79EA7]" />
+        
+        {/* Target Keseluruhan (All-Time) */}
+        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-6 rounded-[1.5rem] shadow-[var(--admin-shadow)] animate-fade-in-up">
+          <h3 className="text-[var(--admin-accent)] font-semibold mb-4 flex items-center gap-2"><FiTarget /> Pengaturan Target Keseluruhan</h3>
+          {isEditingAllTime ? (
+            <form onSubmit={handleUpdateAllTime} className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1 max-w-sm">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)] font-medium">Rp</span>
+                <input type="text" required value={targetAllTime} onChange={e => handleNumberInput(e.target.value, setTargetAllTime)} className="w-full bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-4 py-2.5 text-[var(--admin-text-main)] font-bold focus:outline-none focus:border-[#E79EA7]" />
+              </div>
+              <button type="submit" disabled={isUpdatingTarget} title="Simpan Target Utama" className="bg-[#C9868F] hover:bg-[var(--admin-accent)] text-[var(--admin-surface)] rounded-xl p-3.5 transition-colors flex items-center justify-center flex-shrink-0">
+                {isUpdatingTarget ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <FiCheck size={20} />}
+              </button>
+            </form>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+              <div className="flex-1 max-w-sm bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text-main)] font-bold">
+                Rp {targetAllTime}
+              </div>
+              <button type="button" onClick={() => setIsEditingAllTime(true)} title="Edit Target Utama" className="bg-[var(--admin-input-bg)] hover:bg-[#C9868F] text-[var(--admin-text-main)] hover:text-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-3.5 transition-colors flex items-center justify-center flex-shrink-0">
+                <FiEdit2 size={20} />
+              </button>
             </div>
-            <button type="submit" disabled={isUpdatingTarget} className="bg-[#C9868F] hover:bg-[var(--admin-accent)] text-[var(--admin-surface)] font-bold rounded-xl px-5 py-2.5 transition-colors flex items-center justify-center gap-2">
-              <FiCheck /> {isUpdatingTarget ? 'Menyimpan...' : 'Simpan Target'}
-            </button>
-          </form>
-          <p className="text-[var(--admin-text-muted)] text-xs mt-3">Pilih bulan dan tentukan target. Target ini akan digunakan sebagai patokan persentase pencapaian Laba Bersih di bulan tersebut.</p>
+          )}
+          <p className="text-[var(--admin-text-muted)] text-xs mt-3">Target ini adalah target akhir atau utama tanpa ada batasan waktu pencapaian.</p>
         </div>
-        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-6 rounded-[1.5rem] shadow-[var(--admin-shadow)] overflow-hidden flex flex-col">
-          <h3 className="text-[var(--admin-accent)] font-semibold mb-4 flex items-center gap-2"><FiTarget /> Log Pencapaian Target per Bulan</h3>
-          <div className="overflow-y-auto max-h-[400px] custom-scrollbar pr-2">
+
+        {/* Target Bulanan & Tabel Log */}
+        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-6 rounded-[1.5rem] shadow-[var(--admin-shadow)] animate-fade-in-up" style={{animationDelay: '100ms'}}>
+          <h3 className="text-[var(--admin-accent)] font-semibold mb-4 flex items-center gap-2"><FiCalendar /> Pengaturan Target Bulanan</h3>
+          {isEditingMonthly ? (
+            <form onSubmit={handleUpdateMonthly} className="flex flex-col sm:flex-row gap-4 mb-6">
+              <input type="month" required value={targetMonth} onChange={e => setTargetMonth(e.target.value)} className="bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[#E79EA7] [color-scheme:dark]" />
+              <div className="relative flex-1 max-w-sm">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)] font-medium">Rp</span>
+                <input type="text" required value={targetKeuntungan} onChange={e => handleNumberInput(e.target.value, setTargetKeuntungan)} className="w-full bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-4 py-2.5 text-[var(--admin-text-main)] font-bold focus:outline-none focus:border-[#E79EA7]" />
+              </div>
+              <button type="submit" disabled={isUpdatingTarget} title="Simpan Target Bulanan" className="bg-[#C9868F] hover:bg-[var(--admin-accent)] text-[var(--admin-surface)] rounded-xl p-3.5 transition-colors flex items-center justify-center flex-shrink-0">
+                {isUpdatingTarget ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <FiCheck size={20} />}
+              </button>
+            </form>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-4 mb-6 items-start sm:items-center">
+              <div className="bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text-main)] min-w-[200px]">
+                {format(new Date(targetMonth + '-01'), 'MMMM yyyy')}
+              </div>
+              <div className="flex-1 max-w-sm bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text-main)] font-bold">
+                Rp {targetKeuntungan}
+              </div>
+              <button type="button" onClick={() => setIsEditingMonthly(true)} title="Edit Target Bulanan" className="bg-[var(--admin-input-bg)] hover:bg-[#C9868F] text-[var(--admin-text-main)] hover:text-[var(--admin-surface)] border border-[var(--admin-border)] rounded-xl p-3.5 transition-colors flex items-center justify-center flex-shrink-0">
+                <FiEdit2 size={20} />
+              </button>
+            </div>
+          )}
+
+          {/* Log Pencapaian Target per Bulan */}
+          <div className="overflow-y-auto max-h-[400px] custom-scrollbar pr-2 mt-4 pt-4 border-t border-[var(--admin-border-subtle)]">
+            <h4 className="text-sm font-semibold text-[var(--admin-text-main)] mb-3">Log Pencapaian Target per Bulan</h4>
             <table className="w-full text-left border-collapse">
               <thead className="sticky top-0 z-10 bg-[var(--admin-surface)]">
               <tr className="border-b border-[var(--admin-border)] text-[var(--admin-text-muted)] text-sm bg-[var(--admin-hover-bg)]">
@@ -1028,6 +1140,43 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
           </table>
           </div>
         </div>
+
+        {/* Target Kustom */}
+        <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] p-6 rounded-[1.5rem] shadow-[var(--admin-shadow)] overflow-hidden flex flex-col animate-fade-in-up" style={{animationDelay: '200ms'}}>
+          <h3 className="text-[var(--admin-accent)] font-semibold mb-4 flex items-center gap-2"><FiBox /> Daftar Target Kustom / Impian</h3>
+          
+          <form onSubmit={handleAddCustomTarget} className="flex flex-col sm:flex-row gap-4 mb-6 pb-6 border-b border-[var(--admin-border-subtle)]">
+            <input type="text" placeholder="Nama Target (misal: Beli Lensa)" value={newCustomTarget.name} onChange={e => setNewCustomTarget({...newCustomTarget, name: e.target.value})} className="flex-1 bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl px-4 py-2.5 text-[var(--admin-text-main)] focus:outline-none focus:border-[#E79EA7]" required />
+            <div className="relative w-full sm:w-64">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)] font-medium">Rp</span>
+              <input type="text" required value={newCustomTarget.amount} onChange={e => handleNumberInput(e.target.value, (val) => setNewCustomTarget({...newCustomTarget, amount: val}))} className="w-full bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl pl-10 pr-4 py-2.5 text-[var(--admin-text-main)] font-bold focus:outline-none focus:border-[#E79EA7]" placeholder="0" />
+            </div>
+            <button type="submit" disabled={isUpdatingTarget} className="bg-[var(--admin-accent-bg)] hover:bg-[var(--admin-accent)] text-[var(--admin-accent)] hover:text-[var(--admin-surface)] border border-[#E79EA7]/30 border-solid font-semibold rounded-xl px-6 py-2.5 transition-colors flex items-center gap-2 text-sm whitespace-nowrap">
+              <FiPlus /> Tambah
+            </button>
+          </form>
+
+          <div className="overflow-y-auto max-h-[300px] custom-scrollbar pr-2 space-y-3">
+            {customTargets.length > 0 ? (
+              customTargets.map(target => (
+                <div key={target.id} className="bg-[var(--admin-hover-bg)] border border-[var(--admin-border-subtle)] p-4 rounded-xl flex items-center justify-between group transition-colors">
+                  <div>
+                    <h4 className="text-[var(--admin-text-main)] font-medium">{target.name}</h4>
+                    <span className="text-[#64D194] font-bold text-sm">{formatIDR(target.amount)}</span>
+                  </div>
+                  <button onClick={() => setDeleteModal({ isOpen: true, type: 'custom_target', id: target.id, title: 'Hapus Target Impian?', message: `Apakah Anda yakin ingin menghapus target "${target.name}"?` })} className="text-[#D28A94] bg-[#D28A94]/10 hover:bg-[#D28A94] hover:text-[var(--admin-surface)] p-2.5 rounded-lg transition-colors cursor-pointer opacity-0 group-hover:opacity-100 focus:opacity-100">
+                    <FiTrash2 size={18} />
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-[var(--admin-text-muted)] py-8 text-sm bg-[var(--admin-input-bg)] rounded-xl border border-[var(--admin-border-subtle)] border-dashed">
+                Belum ada target kustom. Tambahkan target di atas!
+              </div>
+            )}
+          </div>
+        </div>
+
       </div>
     );
   };
@@ -1068,6 +1217,8 @@ const AdminFinance = ({ activeSubTab = 'events' }) => {
                     executeDeleteEvent(deleteModal.id);
                   } else if (deleteModal.type === 'transaction') {
                     executeDeleteTransaction(deleteModal.id);
+                  } else if (deleteModal.type === 'custom_target') {
+                    handleDeleteCustomTarget(deleteModal.id);
                   }
                   setDeleteModal({ isOpen: false, type: '', id: null, title: '', message: '' });
                 }}
