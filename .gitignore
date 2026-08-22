@@ -32,3 +32,9 @@ dist-ssr
 
 # OS files
 Thumbs.db
+
+# Caches and Testing
+.eslintcache
+coverage/
+.gemini/
+.agents/
