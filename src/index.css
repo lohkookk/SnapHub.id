@@ -603,11 +603,23 @@
       rgba(217, 4, 41, 0.15) 4px,
       rgba(217, 4, 41, 0.15) 8px) !important;
   color: var(--admin-text-subtle) !important;
-  opacity: 0.6;
+  opacity: 0.6 !important;
   text-decoration: line-through;
   text-decoration-color: rgba(217, 4, 41, 0.8);
   text-decoration-thickness: 1.5px;
   cursor: not-allowed !important;
+}
+
+/* Too Close Date Style (H-7) */
+.calendar-wrapper .too-close-date:disabled {
+  opacity: 0.6 !important;
+  background-color: rgba(255, 170, 0, 0.08) !important;
+  color: rgba(255, 170, 0, 0.8) !important;
+}
+
+/* Past Date Style */
+.calendar-wrapper .past-date:disabled {
+  opacity: 0.15 !important;
 }
 
 /* Finance Date Style */

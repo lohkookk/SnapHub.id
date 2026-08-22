@@ -82,7 +82,7 @@ const AdminSchedule = () => {
         event_name: eventName || 'Event Booked'
       }]);
       if (error) throw error;
-      
+
       const { error: finError } = await supabase.from('financial_events').insert([{
         name: eventName || 'Event Booked',
         date: formattedDate,
@@ -202,8 +202,8 @@ const AdminSchedule = () => {
             </div>
             <h3 className="text-[var(--admin-accent)] font-bold text-xl mb-2 text-center">Batalkan Jadwal?</h3>
             <p className="text-[var(--admin-text-muted)] text-sm mb-8 text-center leading-relaxed">
-              Yakin ingin membatalkan jadwal <br/>
-              <span className="text-[var(--admin-text-main)] font-semibold">{scheduleToDelete.event_name || 'Event Booked'}</span> pada <br/>
+              Yakin ingin membatalkan jadwal <br />
+              <span className="text-[var(--admin-text-main)] font-semibold">{scheduleToDelete.event_name || 'Event Booked'}</span> pada <br />
               <span className="text-[var(--admin-text-main)] font-semibold">{format(new Date(scheduleToDelete.date), 'EEEE, dd MMMM yyyy')}</span>?
             </p>
             <div className="flex justify-center gap-3">
@@ -226,7 +226,6 @@ const AdminSchedule = () => {
           tileContent={tileContent}
           prev2Label={null}
           next2Label={null}
-          minDate={new Date()}
         />
         {loading && (
           <div className="absolute inset-0 bg-black/10 backdrop-blur-sm rounded-[1.5rem] flex items-center justify-center z-10">
