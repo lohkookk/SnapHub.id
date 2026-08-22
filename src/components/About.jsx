@@ -46,12 +46,12 @@ const About = () => {
               initial={{ opacity: 0, y: 18, scale: 0.85 }}
               animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
               transition={{ delay: 0.55, duration: 0.5 }}
-              whileHover={{ y: -4, backgroundColor: 'rgba(255, 255, 255, 0.06)', borderColor: 'rgba(217, 4, 41, 0.35)', boxShadow: '0 0 35px rgba(217, 4, 41, 0.12), 0 20px 50px rgba(0, 0, 0, 0.4)' }}
-              className="absolute bottom-0 -right-2 sm:-right-6 z-20 glass px-5 py-4 rounded-[20px]"
-              style={{ border: '1px solid rgba(217,4,41,0.3)', boxShadow: '0 0 25px rgba(217, 4, 41, 0.45), 0 0 70px rgba(217, 4, 41, 0.12)' }}
+              className="absolute bottom-0 -right-2 sm:-right-6 z-20"
             >
-              <div className="text-[1.75rem] font-bold text-[#D90429] font-heading leading-none">500+</div>
-              <div className="text-gray-400 text-xs mt-1 whitespace-nowrap">Successful Events</div>
+              <div className="glass-card px-5 py-4 glow-red" style={{ border: '1px solid rgba(217,4,41,0.3)' }}>
+                <div className="text-[1.75rem] font-bold text-[#D90429] font-heading leading-none">500+</div>
+                <div className="text-gray-400 text-xs mt-1 whitespace-nowrap">Successful Events</div>
+              </div>
             </motion.div>
 
             {/* Accent card — top left */}
@@ -59,12 +59,12 @@ const About = () => {
               initial={{ opacity: 0, y: -18, scale: 0.85 }}
               animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
               transition={{ delay: 0.7, duration: 0.5 }}
-              whileHover={{ y: -4, backgroundColor: 'rgba(255, 255, 255, 0.06)', borderColor: 'rgba(217, 4, 41, 0.35)', boxShadow: '0 0 35px rgba(217, 4, 41, 0.12), 0 20px 50px rgba(0, 0, 0, 0.4)' }}
-              className="absolute top-0 -left-2 sm:-left-5 z-20 glass px-4 py-3 rounded-[20px]"
-              style={{ border: '1px solid rgba(255,255,255,0.1)' }}
+              className="absolute top-0 -left-2 sm:-left-5 z-20"
             >
-              <div className="text-[1.4rem] font-bold text-white font-heading leading-none">4.9★</div>
-              <div className="text-gray-400 text-xs mt-0.5 whitespace-nowrap">Client Rating</div>
+              <div className="glass-card px-4 py-3" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+                <div className="text-[1.4rem] font-bold text-white font-heading leading-none">4.9★</div>
+                <div className="text-gray-400 text-xs mt-0.5 whitespace-nowrap">Client Rating</div>
+              </div>
             </motion.div>
           </motion.div>
 
