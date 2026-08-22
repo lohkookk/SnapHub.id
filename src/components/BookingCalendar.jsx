@@ -48,7 +48,8 @@ const BookingCalendar = () => {
     const isPast = clickedDate < new Date(new Date().setHours(0, 0, 0, 0));
 
     if (!isBooked && !isPast) {
-      const formattedDate = format(clickedDate, 'dd-MM-yyyy');
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const formattedDate = `${clickedDate.getDate()} ${months[clickedDate.getMonth()]} ${clickedDate.getFullYear()}`;
       const text = `Kak saya mau booking untuk tanggal ${formattedDate} apa bisa ya. Boleh saya tanya tanya terlebih dahulu?`;
       const waUrl = `https://wa.me/6285190643459?text=${encodeURIComponent(text)}`;
       window.open(waUrl, '_blank');
