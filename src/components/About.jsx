@@ -41,28 +41,26 @@ const About = () => {
               </div>
             </div>
 
-            {/* Stat card — bottom right */}
             <motion.div
               initial={{ opacity: 0, y: 18, scale: 0.85 }}
               animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
               transition={{ delay: 0.55, duration: 0.5 }}
-              className="absolute bottom-4 -right-2 sm:-right-6 glass-dark px-6 py-4 glow-red-sm z-20 rounded-2xl"
-              style={{ border: '1px solid rgba(217,4,41,0.4)', background: 'rgba(11, 11, 11, 0.75)' }}
+              className="absolute bottom-0 -right-2 sm:-right-6 glass-card px-5 py-4 glow-red"
+              style={{ border: '1px solid rgba(217,4,41,0.3)' }}
             >
               <div className="text-[1.75rem] font-bold text-[#D90429] font-heading leading-none">500+</div>
-              <div className="text-gray-300 text-[0.8rem] font-medium mt-1">Successful Events</div>
+              <div className="text-gray-400 text-xs mt-1 whitespace-nowrap">Successful Events</div>
             </motion.div>
 
-            {/* Accent card — top left */}
             <motion.div
               initial={{ opacity: 0, y: -18, scale: 0.85 }}
               animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
               transition={{ delay: 0.7, duration: 0.5 }}
-              className="absolute top-4 -left-2 sm:-left-5 glass-dark px-5 py-3.5 z-20 rounded-2xl shadow-xl"
-              style={{ border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(11, 11, 11, 0.75)' }}
+              className="absolute top-0 -left-2 sm:-left-5 glass-card px-4 py-3"
+              style={{ border: '1px solid rgba(255,255,255,0.1)' }}
             >
               <div className="text-[1.4rem] font-bold text-white font-heading leading-none">4.9★</div>
-              <div className="text-gray-300 text-[0.8rem] font-medium mt-0.5">Client Rating</div>
+              <div className="text-gray-400 text-xs mt-0.5 whitespace-nowrap">Client Rating</div>
             </motion.div>
           </motion.div>
 
