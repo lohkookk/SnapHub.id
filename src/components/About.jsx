@@ -48,7 +48,7 @@ const About = () => {
               transition={{ delay: 0.55, duration: 0.5 }}
               className="absolute bottom-0 -right-2 sm:-right-6 z-20"
             >
-              <div className="glass-card px-5 py-4 glow-red" style={{ border: '1px solid rgba(217,4,41,0.3)' }}>
+              <div className="glass-card-red px-5 py-4">
                 <div className="text-[1.75rem] font-bold text-[#D90429] font-heading leading-none">500+</div>
                 <div className="text-gray-400 text-xs mt-1 whitespace-nowrap">Successful Events</div>
               </div>
