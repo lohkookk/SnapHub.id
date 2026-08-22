@@ -41,15 +41,17 @@ const About = () => {
               </div>
             </div>
 
+            {/* Stat card — bottom right */}
             <motion.div
               initial={{ opacity: 0, y: 18, scale: 0.85 }}
               animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
               transition={{ delay: 0.55, duration: 0.5 }}
-              className="absolute bottom-0 -right-2 sm:-right-6 glass-card px-5 py-4 glow-red"
-              style={{ border: '1px solid rgba(217,4,41,0.3)' }}
+              className="absolute bottom-0 -right-2 sm:-right-6 z-20"
             >
-              <div className="text-[1.75rem] font-bold text-[#D90429] font-heading leading-none">500+</div>
-              <div className="text-gray-400 text-xs mt-1 whitespace-nowrap">Successful Events</div>
+              <div className="glass-card px-5 py-4 glow-red" style={{ border: '1px solid rgba(217,4,41,0.3)' }}>
+                <div className="text-[1.75rem] font-bold text-[#D90429] font-heading leading-none">500+</div>
+                <div className="text-gray-400 text-xs mt-1 whitespace-nowrap">Successful Events</div>
+              </div>
             </motion.div>
 
             <motion.div
@@ -100,7 +102,7 @@ const About = () => {
                   key={b.label}
                   variants={fadeUp}
                   whileHover={{ scale: 1.04, borderColor: 'rgba(217,4,41,0.45)' }}
-                  className="glass flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 cursor-default transition-all duration-300 group"
+                  className="glass flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 cursor-default group"
                 >
                   <span className="text-[#D90429] text-[1rem] flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                     {b.icon}

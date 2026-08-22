@@ -79,23 +79,25 @@ const Features = () => {
             className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 overflow-x-auto sm:overflow-visible snap-x snap-mandatory sm:snap-none gap-4 sm:gap-6 pb-6 sm:pb-0 -mx-5 px-5 sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth"
           >
             {FEATURES.map((f, i) => (
-              <motion.article
+              <motion.div
                 key={f.title}
                 variants={card}
-                className="glass-card p-6 flex flex-col gap-4 cursor-default shrink-0 w-[82vw] max-w-[300px] snap-center sm:w-auto sm:max-w-none sm:shrink sm:snap-align-none"
+                className="shrink-0 w-[82vw] max-w-[300px] snap-center sm:w-auto sm:max-w-none sm:shrink sm:snap-align-none"
               >
-                <div className="w-11 h-11 rounded-xl bg-[#D90429]/10 border border-[#D90429]/20 flex items-center justify-center text-[#D90429] text-lg flex-shrink-0">
-                  {f.icon}
-                </div>
-                <div>
-                  <h3 className="text-white font-semibold text-[0.95rem] mb-2 font-heading">{f.title}</h3>
-                  <p className="text-gray-400 text-[0.83rem] leading-relaxed">{f.desc}</p>
-                </div>
-                <div className="mt-auto pt-4 border-t border-white/10">
-                  <div className="h-[2px] rounded-full"
-                    style={{ background: `linear-gradient(90deg, #D90429 ${(i + 1) * 12}%, transparent)`, opacity: 0.45 }} />
-                </div>
-              </motion.article>
+                <article className="glass-card p-6 flex flex-col gap-4 cursor-default h-full">
+                  <div className="w-11 h-11 rounded-xl bg-[#D90429]/10 border border-[#D90429]/20 flex items-center justify-center text-[#D90429] text-lg flex-shrink-0">
+                    {f.icon}
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold text-[0.95rem] mb-2 font-heading">{f.title}</h3>
+                    <p className="text-gray-400 text-[0.83rem] leading-relaxed">{f.desc}</p>
+                  </div>
+                  <div className="mt-auto pt-4 border-t border-white/10">
+                    <div className="h-[2px] rounded-full"
+                      style={{ background: `linear-gradient(90deg, #D90429 ${(i + 1) * 12}%, transparent)`, opacity: 0.45 }} />
+                  </div>
+                </article>
+              </motion.div>
             ))}
           </motion.div>
 
