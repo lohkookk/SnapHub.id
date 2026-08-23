@@ -1,4 +1,4 @@
-﻿User-agent: *
+User-agent: *
 Allow: /
 
-Sitemap: https://snaphub-akasha.vercel.app/sitemap.xml
+Sitemap: https://www.snaphub-akasha.site/sitemap.xml
