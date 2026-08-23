@@ -4,9 +4,11 @@ import { motion, useInView } from 'framer-motion';
 import { isSameDay, parseISO, format } from 'date-fns';
 import { supabase } from '../lib/supabase';
 import 'react-calendar/dist/Calendar.css';
+import { FiCalendar } from 'react-icons/fi';
 
 const BookingCalendar = () => {
   const [bookedDates, setBookedDates] = useState([]);
+  const [dbData, setDbData] = useState([]);
   const [loading, setLoading] = useState(true);
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-50px' });
@@ -21,10 +23,11 @@ const BookingCalendar = () => {
         setLoading(false);
         return; // Skip if no env setup
       }
-      const { data, error } = await supabase.from('booked_dates').select('date');
+      const { data, error } = await supabase.from('booked_dates').select('*');
       if (error) throw error;
 
       if (data) {
+        setDbData(data);
         setBookedDates(data.map(item => parseISO(item.date)));
       }
     } catch (error) {
@@ -69,6 +72,10 @@ const BookingCalendar = () => {
   };
 
 
+  const today = new Date(new Date().setHours(0, 0, 0, 0));
+  const upcomingSchedules = dbData
+    .filter(d => new Date(d.date) >= today)
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
 
   return (
     <section id="availability" className="section-pad bg-[#0B0B0B] relative overflow-hidden" ref={ref}>
@@ -87,10 +94,13 @@ const BookingCalendar = () => {
           Tanggal dengan indikator merah menunjukkan bahwa jadwal SnapHub sudah di-booking penuh. Segera amankan tanggal bahagiamu!
         </motion.p>
 
-        {/* Calendar Container */}
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={inView ? { opacity: 1, scale: 1 } : {}} transition={{ duration: 0.5, delay: 0.3 }}
-          className="glass-dark border border-white/10 p-6 md:p-8 rounded-[2rem] max-w-md w-full shadow-[0_0_40px_rgba(0,0,0,0.5)] calendar-wrapper"
-        >
+        {/* Container for Calendar and List */}
+        <div className="flex flex-col lg:flex-row lg:items-start gap-8 w-full max-w-[1000px] justify-center">
+
+          {/* Calendar Container */}
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={inView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.5, delay: 0.3 }}
+            className="glass-dark border border-white/10 p-6 md:p-8 rounded-[2rem] w-full max-w-md shadow-[0_0_40px_rgba(0,0,0,0.5)] calendar-wrapper shrink-0"
+          >
           {loading ? (
             <div className="flex justify-center items-center py-20">
               <div className="w-8 h-8 border-2 border-white/10 border-t-[#D90429] rounded-full animate-spin" />
@@ -170,6 +180,40 @@ const BookingCalendar = () => {
             </div>
           )}
         </motion.div>
+
+        {/* Upcoming Events Container */}
+        <motion.div initial={{ opacity: 0, x: 20 }} animate={inView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.5, delay: 0.4 }}
+          className="glass-dark border border-white/10 p-6 md:p-8 rounded-[2rem] w-full max-w-md shadow-[0_0_40px_rgba(0,0,0,0.5)] flex flex-col"
+        >
+          <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+            <FiCalendar className="text-[#D90429]" />
+            Event Mendatang
+          </h3>
+          
+          <div className="overflow-y-auto pr-2 custom-scrollbar max-h-[340px] space-y-3">
+            {loading ? (
+               <div className="flex justify-center items-center py-20">
+                  <div className="w-8 h-8 border-2 border-white/10 border-t-[#D90429] rounded-full animate-spin" />
+               </div>
+            ) : upcomingSchedules.length === 0 ? (
+              <p className="text-gray-400 text-sm italic text-center py-8">Belum ada event mendatang.</p>
+            ) : (
+              upcomingSchedules.map(sched => (
+                <div key={sched.id} className="flex items-center gap-4 p-4 bg-white/[0.02] border border-white/10 rounded-xl hover:bg-white/[0.05] transition-colors">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center border shrink-0 bg-[#D90429]/10 border-[#D90429]/20 text-[#D90429]">
+                    <FiCalendar size={18} />
+                  </div>
+                  <div>
+                    <p className="text-white font-medium">{sched.event_name || 'Event Booked'}</p>
+                    <p className="text-gray-400 text-sm">{format(parseISO(sched.date), 'EEEE, dd MMMM yyyy')}</p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </motion.div>
+        
+        </div>
       </div>
     </section>
   );
