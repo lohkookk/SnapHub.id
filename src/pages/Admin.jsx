@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import toast, { Toaster } from 'react-hot-toast';
-import { FiLogOut, FiArrowLeft, FiPieChart, FiCalendar, FiDollarSign, FiMenu, FiX, FiChevronDown, FiSun, FiMoon, FiImage } from 'react-icons/fi';
+import { FiLogOut, FiArrowLeft, FiPieChart, FiCalendar, FiDollarSign, FiMenu, FiX, FiChevronDown, FiSun, FiMoon, FiImage, FiStar } from 'react-icons/fi';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 // Admin Sub-components
@@ -9,6 +9,7 @@ import AdminSchedule from '../components/AdminSchedule';
 import AdminDashboard from '../components/AdminDashboard';
 import AdminFinance from '../components/AdminFinance';
 import AdminGallery from '../components/AdminGallery';
+import AdminReviews from '../components/AdminReviews';
 
 const Admin = () => {
   const [session, setSession] = useState(null);
@@ -34,6 +35,7 @@ const Admin = () => {
 
   if (pathParts[1] === 'schedule') activeTab = 'schedule';
   else if (pathParts[1] === 'gallery') activeTab = 'gallery';
+  else if (pathParts[1] === 'reviews') activeTab = 'reviews';
   else if (pathParts[1] === 'finance') {
     if (pathParts[2] === 'recap') activeTab = 'finance_recap';
     else if (pathParts[2] === 'target') activeTab = 'finance_target';
@@ -46,6 +48,7 @@ const Admin = () => {
     if (tabId === 'dashboard') navigate('/admin/dashboard');
     else if (tabId === 'schedule') navigate('/admin/schedule');
     else if (tabId === 'gallery') navigate('/admin/gallery');
+    else if (tabId === 'reviews') navigate('/admin/reviews');
     else if (tabId === 'finance_events') navigate('/admin/finance/events');
     else if (tabId === 'finance_recap') navigate('/admin/finance/recap');
     else if (tabId === 'finance_target') navigate('/admin/finance/target');
@@ -159,6 +162,7 @@ const Admin = () => {
     { id: 'dashboard', label: 'Dashboard', icon: <FiPieChart size={20} /> },
     { id: 'gallery', label: 'Galeri', icon: <FiImage size={20} /> },
     { id: 'schedule', label: 'Jadwal', icon: <FiCalendar size={20} /> },
+    { id: 'reviews', label: 'Reviews', icon: <FiStar size={20} /> },
     {
       id: 'finance',
       label: 'Event & Keuangan',
@@ -332,6 +336,7 @@ const Admin = () => {
             {activeTab === 'dashboard' && <AdminDashboard />}
             {activeTab === 'schedule' && <AdminSchedule />}
             {activeTab === 'gallery' && <AdminGallery />}
+            {activeTab === 'reviews' && <AdminReviews />}
             {activeTab === 'finance_events' && <AdminFinance activeSubTab="events" />}
             {activeTab === 'finance_operational' && <AdminFinance activeSubTab="operational" />}
             {activeTab === 'finance_recap' && <AdminFinance activeSubTab="recap" />}

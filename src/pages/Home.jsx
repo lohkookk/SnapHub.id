@@ -4,6 +4,7 @@ import Hero from '../components/Hero';
 import About from '../components/About';
 import Features from '../components/Features';
 import Gallery from '../components/Gallery';
+import Reviews from '../components/Reviews';
 import Pricelist from '../components/Pricelist';
 import BookingCalendar from '../components/BookingCalendar';
 import Maps from '../components/Maps';
@@ -20,6 +21,7 @@ const Home = () => {
         <About />
         <Features />
         <Gallery />
+        <Reviews />
         <Pricelist />
         <BookingCalendar />
         {/* <ProfitCalculator /> */}

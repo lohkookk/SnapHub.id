@@ -133,7 +133,7 @@ const Gallery = () => {
 
           <motion.p initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.65, delay: 0.2 }}
             className="section-desc mb-8">
-            Every frame tells a story. Explore our portfolio of unforgettable events and memories.
+            Setiap karya memiliki narasi yang unik. Kami mengundang Anda untuk meninjau portofolio kami yang memuat dokumentasi berbagai acara dan momen berkesan.
           </motion.p>
 
           {/* Filter tabs — centered */}
