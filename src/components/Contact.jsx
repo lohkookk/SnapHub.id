@@ -62,8 +62,7 @@ const Contact = () => {
           transition={{ duration: 0.7, delay: 0.3 }}
           className="text-gray-400 text-[0.95rem] md:text-base mb-12 max-w-lg mx-auto leading-[1.85]"
         >
-          Contact us today and let's create something extraordinary together.
-          Our team is ready to craft the perfect photobooth experience for your event.
+          Silakan hubungi tim kami hari ini untuk bermitra dalam menciptakan solusi yang istimewa. Kami siap merancang pengalaman photobooth yang sesuai dengan kebutuhan acara Anda.
         </motion.p>
 
         {/* Buttons — centred row */}
