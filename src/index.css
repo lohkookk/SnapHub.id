@@ -727,15 +727,4 @@
 
 .bot-pulse {
   animation: bot-pulse 2.2s infinite;
-}@ k e y f r a m e s   m a r q u e e   { 
-     0 %   {   t r a n s f o r m :   t r a n s l a t e X ( 0 ) ;   } 
-     1 0 0 %   {   t r a n s f o r m :   t r a n s l a t e X ( - 3 3 . 3 3 3 3 3 3 % ) ;   } 
- } 
- . a n i m a t e - m a r q u e e   { 
-     a n i m a t i o n :   m a r q u e e   3 5 s   l i n e a r   i n f i n i t e ; 
-     d i s p l a y :   f l e x ; 
- } 
- . a n i m a t e - m a r q u e e : h o v e r   { 
-     a n i m a t i o n - p l a y - s t a t e :   p a u s e d ; 
- }  
- 
+}

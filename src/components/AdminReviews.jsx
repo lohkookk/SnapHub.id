@@ -161,7 +161,8 @@ const AdminReviews = () => {
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="flex items-center space-x-2 bg-[var(--admin-accent)] hover:bg-opacity-80 text-white px-4 py-2.5 rounded-xl transition-all font-medium text-sm w-fit"
+          className="flex items-center space-x-2 bg-[var(--admin-accent)] hover:bg-opacity-80 text-black px-4 py-2.5 rounded-xl transition-all font-medium text-sm w-fit"
+          style={{ color: '#000000' }}
         >
           <FiPlus size={18} />
           <span>Tambah Review</span>
@@ -313,7 +314,8 @@ const AdminReviews = () => {
                   <button 
                     type="submit" 
                     disabled={loading} 
-                    className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--admin-accent)] hover:bg-opacity-80 text-white transition-colors font-medium text-sm border border-[var(--admin-accent)] cursor-pointer disabled:opacity-50"
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--admin-accent)] hover:bg-opacity-80 text-black transition-colors font-medium text-sm border border-[var(--admin-accent)] cursor-pointer disabled:opacity-50"
+                    style={{ color: '#000000' }}
                   >
                     {loading ? 'Menyimpan...' : 'Simpan'}
                   </button>

@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { supabase } from '../lib/supabase';
-import { FiStar } from 'react-icons/fi';
+import { FiStar, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { FaQuoteLeft } from 'react-icons/fa';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
@@ -11,11 +11,19 @@ const Reviews = () => {
   const [loading, setLoading] = useState(true);
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-10%" });
-  
-  const [emblaRef] = useEmblaCarousel(
-    { loop: true, align: 'center', dragFree: false }, 
+
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { loop: true, align: 'center', dragFree: false },
     [Autoplay({ delay: 3500, stopOnInteraction: true, stopOnMouseEnter: true })]
   );
+
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
+
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
 
   useEffect(() => {
     fetchReviews();
@@ -79,16 +87,28 @@ const Reviews = () => {
           <div className="w-10 h-10 border-4 border-[#D90429] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="relative w-full py-4 -rotate-1 cursor-grab active:cursor-grabbing">
+        <div className="group relative w-full py-4 -rotate-1 cursor-grab active:cursor-grabbing">
+          {/* Navigation Buttons */}
+          <div className="absolute inset-y-0 left-2 md:left-6 flex items-center z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button onClick={scrollPrev} className="bg-[#111111]/80 hover:bg-[#D90429] text-white p-2 md:p-3 rounded-full backdrop-blur-sm transition-colors border border-white/10 shadow-xl cursor-pointer">
+              <FiChevronLeft size={24} />
+            </button>
+          </div>
+          <div className="absolute inset-y-0 right-2 md:right-6 flex items-center z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button onClick={scrollNext} className="bg-[#111111]/80 hover:bg-[#D90429] text-white p-2 md:p-3 rounded-full backdrop-blur-sm transition-colors border border-white/10 shadow-xl cursor-pointer">
+              <FiChevronRight size={24} />
+            </button>
+          </div>
+
           {/* Subtle gradient masks for the edges */}
-          <div className="absolute top-0 bottom-0 left-0 w-12 md:w-32 bg-gradient-to-r from-[#0B0B0B] to-transparent z-10 pointer-events-none" />
+          <div className="absolute top-0 bottom-0 left-0 w-12 md:w-8 bg-gradient-to-r from-[#0B0B0B] to-transparent z-10 pointer-events-none" />
           <div className="absolute top-0 bottom-0 right-0 w-12 md:w-32 bg-gradient-to-l from-[#0B0B0B] to-transparent z-10 pointer-events-none" />
-          
+
           <div className="overflow-hidden w-full" ref={emblaRef}>
-            <div className="flex touch-pan-y">
+            <div className="flex touch-pan-y py-6">
               {displayReviews.map((review, idx) => (
-                <div 
-                  key={`${review.id}-${idx}`} 
+                <div
+                  key={`${review.id}-${idx}`}
                   className="flex-[0_0_85%] sm:flex-[0_0_45%] md:flex-[0_0_33.333%] lg:flex-[0_0_25%] xl:flex-[0_0_22%] min-w-0 px-3 md:px-4"
                 >
                   <div className="bg-[#111111] border border-white/10 rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-[#D90429]/30 hover:-translate-y-2 transition-all duration-300 h-full">

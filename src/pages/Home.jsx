@@ -2,6 +2,7 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import About from '../components/About';
+import ClientLogos from '../components/ClientLogos';
 import Features from '../components/Features';
 import Gallery from '../components/Gallery';
 import Reviews from '../components/Reviews';
@@ -23,8 +24,8 @@ const Home = () => {
         <Gallery />
         <Reviews />
         <Pricelist />
+        <ClientLogos />
         <BookingCalendar />
-        {/* <ProfitCalculator /> */}
         <Maps />
         <Contact />
       </main>
