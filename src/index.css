@@ -710,3 +710,21 @@
     box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
   }
 }
+
+@keyframes bot-pulse {
+  0% {
+    box-shadow: 0 4px 24px rgba(217, 4, 41, 0.4), 0 0 0 0 rgba(217, 4, 41, 0.55);
+  }
+
+  70% {
+    box-shadow: 0 4px 24px rgba(217, 4, 41, 0.4), 0 0 0 14px rgba(217, 4, 41, 0);
+  }
+
+  100% {
+    box-shadow: 0 4px 24px rgba(217, 4, 41, 0.4), 0 0 0 0 rgba(217, 4, 41, 0);
+  }
+}
+
+.bot-pulse {
+  animation: bot-pulse 2.2s infinite;
+}

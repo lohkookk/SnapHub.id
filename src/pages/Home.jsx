@@ -9,7 +9,7 @@ import BookingCalendar from '../components/BookingCalendar';
 import Maps from '../components/Maps';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
-import FloatingWhatsapp from '../components/FloatingWhatsapp';
+import BotAssistant from '../components/BotAssistant';
 
 const Home = () => {
   return (
@@ -27,7 +27,7 @@ const Home = () => {
         <Contact />
       </main>
       <Footer />
-      <FloatingWhatsapp />
+      <BotAssistant />
     </>
   );
 };

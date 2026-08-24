@@ -50,21 +50,62 @@ const Gallery = () => {
         setLoading(false);
       }
     };
-    
+
     fetchGallery();
   }, []);
 
-  const scroll = (direction) => {
-    if (carouselRef.current) {
-      const scrollAmount = direction === 'left' ? -320 : 320;
-      carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  };
-
   const [active, setActive] = useState('All');
   const [lightbox, setLightbox] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const filtered = active === 'All' ? dynamicGallery : dynamicGallery.filter((g) => g.cat === active);
+
+  const calculatePages = useCallback(() => {
+    if (carouselRef.current && carouselRef.current.children.length > 0) {
+      const { scrollLeft, clientWidth } = carouselRef.current;
+      const child = carouselRef.current.children[0];
+      const itemWidth = child.offsetWidth;
+      const gap = window.innerWidth < 640 ? 16 : 24;
+      const fullItemWidth = itemWidth + gap;
+
+      const itemsPerPage = Math.floor(clientWidth / fullItemWidth) || 1;
+      const stepSize = itemsPerPage * fullItemWidth;
+
+      const total = Math.ceil(filtered.length / itemsPerPage);
+      const current = Math.round(scrollLeft / stepSize) + 1;
+
+      setTotalPages(Math.max(1, total));
+      setCurrentPage(Math.min(Math.max(1, current), Math.max(1, total)));
+    }
+  }, [filtered.length]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    if (carouselRef.current) {
+      carouselRef.current.scrollLeft = 0;
+    }
+    setTimeout(calculatePages, 100);
+  }, [active, dynamicGallery, calculatePages]);
+
+  useEffect(() => {
+    window.addEventListener('resize', calculatePages);
+    return () => window.removeEventListener('resize', calculatePages);
+  }, [calculatePages]);
+
+  const scroll = (direction) => {
+    if (carouselRef.current && carouselRef.current.children.length > 0) {
+      const child = carouselRef.current.children[0];
+      const itemWidth = child.offsetWidth;
+      const gap = window.innerWidth < 640 ? 16 : 24;
+      const fullItemWidth = itemWidth + gap;
+
+      const itemsPerPage = Math.floor(carouselRef.current.clientWidth / fullItemWidth) || 1;
+      const scrollAmount = itemsPerPage * fullItemWidth;
+
+      carouselRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    }
+  };
   const openLb = (i) => setLightbox(i);
   const closeLb = () => setLightbox(null);
   const prev = useCallback(() => setLightbox((i) => (i - 1 + filtered.length) % filtered.length), [filtered.length]);
@@ -97,7 +138,7 @@ const Gallery = () => {
 
           {/* Filter tabs — centered */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6, delay: 0.3 }}
-           className="flex flex-wrap justify-center gap-3 md:gap-4 mb-16">
+            className="flex flex-wrap justify-center gap-3 md:gap-4 mb-16">
             {categories.map((c) => (
               <motion.button
                 key={c}
@@ -117,18 +158,18 @@ const Gallery = () => {
 
         {/* ── Carousel Layout (4R and 2R) ───────────────────────── */}
         <div className="relative group mt-4">
-            {loading ? (
-              <div className="flex justify-center py-20">
-                <div className="w-10 h-10 border-4 border-[#D90429] border-t-transparent rounded-full animate-spin" />
-              </div>
-            ) : (
-              <motion.div
-                ref={carouselRef}
-                layout
-                className={`flex overflow-x-auto snap-x snap-mandatory gap-4 sm:gap-6 pb-8 -mx-5 px-5 sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth items-center ${filtered.length === 1 ? 'justify-center' : ''}`}
-              >
-                {filtered.map((img, i) => {
-                  return (
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="w-10 h-10 border-4 border-[#D90429] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <motion.div
+              ref={carouselRef}
+              onScroll={calculatePages}
+              className={`flex overflow-x-auto snap-x snap-mandatory gap-4 sm:gap-6 pb-8 -mx-5 px-[10vw] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth items-center ${filtered.length === 1 ? 'justify-center' : ''}`}
+            >
+              {filtered.map((img, i) => {
+                return (
                   <motion.div
                     key={img.id}
                     layout
@@ -137,7 +178,7 @@ const Gallery = () => {
                     exit={{ opacity: 0, scale: 0.92 }}
                     transition={{ duration: 0.38, delay: i * 0.04 }}
                     onClick={() => openLb(i)}
-                    className="relative rounded-2xl overflow-hidden cursor-pointer group shrink-0 snap-center transition-all w-[240px] h-[360px] sm:w-[320px] sm:h-[480px] lg:w-[400px] lg:h-[600px]"
+                    className="relative rounded-2xl overflow-hidden cursor-pointer group shrink-0 snap-center transition-all aspect-[2/3] w-[80vw] sm:w-[calc(50%-12px)] lg:w-[calc(33.3333%-16px)]"
                   >
                     <img
                       src={img.src}
@@ -154,11 +195,11 @@ const Gallery = () => {
                     </div>
                     <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-[#D90429]/30 transition-all duration-400 pointer-events-none" />
                   </motion.div>
-                  );
-                })}
-              </motion.div>
-            )}
-          
+                );
+              })}
+            </motion.div>
+          )}
+
           {/* Navigation Arrows */}
           {filtered.length > 1 && (
             <>
@@ -175,6 +216,15 @@ const Gallery = () => {
                 <FiChevronRight size={24} />
               </button>
             </>
+          )}
+
+          {/* Carousel Counter */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-6">
+              <div className="px-4 py-1.5 rounded-full text-xs font-medium text-gray-400 bg-white/[0.03] border border-white/10 shadow-sm backdrop-blur-sm">
+                {currentPage} <span className="mx-1 opacity-50">/</span> {totalPages}
+              </div>
+            </div>
           )}
         </div>
       </div>
