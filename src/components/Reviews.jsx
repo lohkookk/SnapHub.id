@@ -12,9 +12,13 @@ const Reviews = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-10%" });
 
+  const [plugins] = useState(() => [
+    Autoplay({ delay: 3500, stopOnInteraction: false, stopOnMouseEnter: true })
+  ]);
+
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: 'center', dragFree: false },
-    [Autoplay({ delay: 3500, stopOnInteraction: true, stopOnMouseEnter: true })]
+    plugins
   );
 
   const scrollPrev = useCallback(() => {
