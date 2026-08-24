@@ -139,7 +139,7 @@ const AdminGallery = () => {
       closeAddModal();
       fetchImages();
     } catch (error) {
-      toast.error('Gagal mengunggah gambar.');
+      toast.error('Gagal mengunggah gambar: ' + (error.message || 'Unknown error'));
       console.error(error);
     } finally {
       setUploading(false);
@@ -180,7 +180,7 @@ const AdminGallery = () => {
       closeEditModal();
       fetchImages();
     } catch (error) {
-      toast.error('Gagal memperbarui data gambar.');
+      toast.error('Gagal memperbarui data gambar: ' + (error.message || 'Unknown error'));
       console.error(error);
     } finally {
       setUploading(false);
@@ -213,7 +213,7 @@ const AdminGallery = () => {
       setImageToDelete(null);
       fetchImages();
     } catch (error) {
-      toast.error('Gagal menghapus gambar.');
+      toast.error('Gagal menghapus gambar: ' + (error.message || 'Unknown error'));
       console.error(error);
     } finally {
       setUploading(false);
@@ -234,8 +234,8 @@ const AdminGallery = () => {
               </span>
             </div>
             <div className="w-full bg-[var(--admin-input-bg)] rounded-full h-2">
-              <div 
-                className={`h-2 rounded-full ${storageUsed > MAX_STORAGE_BYTES * 0.9 ? 'bg-red-500' : 'bg-[var(--admin-accent)]'}`} 
+              <div
+                className={`h-2 rounded-full ${storageUsed > MAX_STORAGE_BYTES * 0.9 ? 'bg-red-500' : 'bg-[var(--admin-accent)]'}`}
                 style={{ width: `${Math.min((storageUsed / MAX_STORAGE_BYTES) * 100, 100)}%` }}
               ></div>
             </div>
@@ -326,7 +326,8 @@ const AdminGallery = () => {
                     <div className="text-center p-4">
                       <FiUpload size={24} className="text-[var(--admin-text-muted)] mx-auto mb-2" />
                       <span className="text-sm text-[var(--admin-text-muted)]">Klik untuk pilih gambar</span> <br />
-                      <span className="text-sm text-[var(--admin-text-muted)]">Max. 100kb</span>
+                      <span className="text-sm text-[var(--admin-text-muted)]">Max. 1000kb</span><br />
+                      <span className="text-sm text-[var(--admin-text-muted)]">Format WebP</span>
                     </div>
                   )}
                 </div>
@@ -341,15 +342,6 @@ const AdminGallery = () => {
                 </select>
               </div>
 
-              <div>
-                <label className="block text-[var(--admin-text-muted)] text-sm mb-2 font-medium">Ukuran Tampilan</label>
-                <select value={span} onChange={e => setSpan(e.target.value)} className="w-full bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl px-4 py-3 text-[var(--admin-text-main)] text-sm focus:outline-none focus:border-[var(--admin-accent)]">
-                  <option value="" className="bg-[var(--admin-bg)]">Normal (Kotak 1x1)</option>
-                  <option value="row-span-2" className="bg-[var(--admin-bg)]">Tinggi (Potret 1x2)</option>
-                  <option value="col-span-2" className="bg-[var(--admin-bg)]">Lebar (Lanskap 2x1)</option>
-                  <option value="col-span-2 row-span-2" className="bg-[var(--admin-bg)]">Besar (Utama 2x2)</option>
-                </select>
-              </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -428,15 +420,6 @@ const AdminGallery = () => {
                 </select>
               </div>
 
-              <div>
-                <label className="block text-[var(--admin-text-muted)] text-sm mb-2 font-medium">Ukuran Tampilan</label>
-                <select value={editSpan} onChange={e => setEditSpan(e.target.value)} className="w-full bg-[var(--admin-input-bg)] border border-[var(--admin-border)] rounded-xl px-4 py-3 text-[var(--admin-text-main)] text-sm focus:outline-none focus:border-[var(--admin-accent)]">
-                  <option value="" className="bg-[var(--admin-bg)]">Normal (Kotak 1x1)</option>
-                  <option value="row-span-2" className="bg-[var(--admin-bg)]">Tinggi (Potret 1x2)</option>
-                  <option value="col-span-2" className="bg-[var(--admin-bg)]">Lebar (Lanskap 2x1)</option>
-                  <option value="col-span-2 row-span-2" className="bg-[var(--admin-bg)]">Besar (Utama 2x2)</option>
-                </select>
-              </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>

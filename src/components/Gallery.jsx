@@ -71,7 +71,7 @@ const Gallery = () => {
   const next = useCallback(() => setLightbox((i) => (i + 1) % filtered.length), [filtered.length]);
 
   return (
-    <section id="gallery" className="section-pad bg-[#0B0B0B] relative overflow-hidden">
+    <section id="gallery" className="pt-20 md:pt-[6.5rem] lg:pt-[8rem] pb-4 md:pb-6 lg:pb-8 bg-[#0B0B0B] relative overflow-hidden">
       {/* Top bleed from features */}
       <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[#111111] to-transparent pointer-events-none" />
 
@@ -115,9 +115,8 @@ const Gallery = () => {
           </motion.div>
         </div>
 
-        {/* ── Masonry Grid / Mobile Carousel ───────────────────────── */}
-        <div className="relative group">
-          <div className="lg:hidden relative">
+        {/* ── Carousel Layout (4R and 2R) ───────────────────────── */}
+        <div className="relative group mt-4">
             {loading ? (
               <div className="flex justify-center py-20">
                 <div className="w-10 h-10 border-4 border-[#D90429] border-t-transparent rounded-full animate-spin" />
@@ -126,47 +125,9 @@ const Gallery = () => {
               <motion.div
                 ref={carouselRef}
                 layout
-                className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-6 -mx-5 px-5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth"
+                className={`flex overflow-x-auto snap-x snap-mandatory gap-4 sm:gap-6 pb-8 -mx-5 px-5 sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth items-center ${filtered.length === 1 ? 'justify-center' : ''}`}
               >
-                {filtered.map((img, i) => (
-                  <motion.div
-                    key={img.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.92 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.92 }}
-                    transition={{ duration: 0.38, delay: i * 0.04 }}
-                    onClick={() => openLb(i)}
-                    className="relative rounded-2xl overflow-hidden cursor-pointer group shrink-0 snap-center w-[82vw] max-w-[320px] h-[350px]"
-                  >
-                    <img
-                      src={img.src}
-                      alt={img.alt || img.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.07]"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
-                      <p className="text-[#D90429] text-[0.68rem] font-medium uppercase tracking-widest mb-1">{img.cat}</p>
-                      <p className="text-white font-semibold text-[0.9rem] font-heading">{img.title}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
-          </div>
-          
-          {/* Desktop Grid */}
-          <div style={{ gridAutoRows: '240px' }} className="hidden lg:grid grid-cols-4 gap-6 grid-flow-dense">
-            {loading ? (
-              <div className="col-span-4 flex justify-center py-20">
-                <div className="w-10 h-10 border-4 border-[#D90429] border-t-transparent rounded-full animate-spin" />
-              </div>
-            ) : (
-              <AnimatePresence mode="popLayout">
                 {filtered.map((img, i) => {
-                  const isCol2 = img.span?.includes('col-span-2');
-                  const isRow2 = img.span?.includes('row-span-2');
-                  
                   return (
                   <motion.div
                     key={img.id}
@@ -176,11 +137,7 @@ const Gallery = () => {
                     exit={{ opacity: 0, scale: 0.92 }}
                     transition={{ duration: 0.38, delay: i * 0.04 }}
                     onClick={() => openLb(i)}
-                    style={{
-                      gridColumn: isCol2 ? 'span 2 / span 2' : undefined,
-                      gridRow: isRow2 ? 'span 2 / span 2' : undefined
-                    }}
-                    className={`relative rounded-2xl overflow-hidden cursor-pointer group ${img.span || ''}`}
+                    className="relative rounded-2xl overflow-hidden cursor-pointer group shrink-0 snap-center transition-all w-[240px] h-[360px] sm:w-[320px] sm:h-[480px] lg:w-[400px] lg:h-[600px]"
                   >
                     <img
                       src={img.src}
@@ -199,23 +156,26 @@ const Gallery = () => {
                   </motion.div>
                   );
                 })}
-              </AnimatePresence>
+              </motion.div>
             )}
-          </div>
-
-          {/* Navigation Arrows (Mobile Carousel Only) */}
-          <button
-            onClick={() => scroll('left')}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-[#0B0B0B]/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-md border border-white/10 sm:hidden hover:bg-[#D90429] shadow-xl ml-2"
-          >
-            <FiChevronLeft size={24} />
-          </button>
-          <button
-            onClick={() => scroll('right')}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-[#0B0B0B]/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-md border border-white/10 sm:hidden hover:bg-[#D90429] shadow-xl mr-2"
-          >
-            <FiChevronRight size={24} />
-          </button>
+          
+          {/* Navigation Arrows */}
+          {filtered.length > 1 && (
+            <>
+              <button
+                onClick={() => scroll('left')}
+                className="absolute left-2 sm:-left-4 md:-left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0B0B0B]/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-md border border-white/10 hover:bg-[#D90429] shadow-xl"
+              >
+                <FiChevronLeft size={24} />
+              </button>
+              <button
+                onClick={() => scroll('right')}
+                className="absolute right-2 sm:-right-4 md:-right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0B0B0B]/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-md border border-white/10 hover:bg-[#D90429] shadow-xl"
+              >
+                <FiChevronRight size={24} />
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -242,7 +202,7 @@ const Gallery = () => {
               <img
                 src={filtered[lightbox]?.src}
                 alt={filtered[lightbox]?.alt || filtered[lightbox]?.title}
-                className="w-full max-h-[78vh] object-contain rounded-2xl mx-auto"
+                className="w-auto max-w-full h-auto max-h-[80vh] object-contain rounded-2xl mx-auto shadow-2xl"
               />
               <div className="mt-4">
                 <p className="text-[#D90429] text-xs tracking-widest uppercase">{filtered[lightbox]?.cat}</p>
@@ -254,17 +214,21 @@ const Gallery = () => {
               className="absolute top-5 right-5 w-10 h-10 glass border border-white/10 rounded-full flex items-center justify-center text-white hover:text-[#D90429] transition-colors">
               <FiX size={18} />
             </button>
-            <button onClick={(e) => { e.stopPropagation(); prev(); }} aria-label="Previous"
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 glass border border-white/10 rounded-full flex items-center justify-center text-white hover:text-[#D90429] transition-colors">
-              <FiChevronLeft size={20} />
-            </button>
-            <button onClick={(e) => { e.stopPropagation(); next(); }} aria-label="Next"
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 glass border border-white/10 rounded-full flex items-center justify-center text-white hover:text-[#D90429] transition-colors">
-              <FiChevronRight size={20} />
-            </button>
-            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 glass border border-white/10 px-3 py-1 rounded-full text-xs text-gray-400">
-              {lightbox + 1} / {filtered.length}
-            </div>
+            {filtered.length > 1 && (
+              <>
+                <button onClick={(e) => { e.stopPropagation(); prev(); }} aria-label="Previous"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 glass border border-white/10 rounded-full flex items-center justify-center text-white hover:text-[#D90429] transition-colors">
+                  <FiChevronLeft size={20} />
+                </button>
+                <button onClick={(e) => { e.stopPropagation(); next(); }} aria-label="Next"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 glass border border-white/10 rounded-full flex items-center justify-center text-white hover:text-[#D90429] transition-colors">
+                  <FiChevronRight size={20} />
+                </button>
+                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 glass border border-white/10 px-3 py-1 rounded-full text-xs text-gray-400">
+                  {lightbox + 1} / {filtered.length}
+                </div>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
