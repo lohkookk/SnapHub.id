@@ -24,8 +24,12 @@ const BOT_TEMPLATES = [
     reply: 'Untuk acara pernikahan atau event besar, kami sangat merekomendasikan Paket Unlimited Print! Sedangkan untuk intimate event atau ulang tahun, Paket Limited Print (mulai 100 prints) sudah sangat cocok. Ingin rekomendasi yang lebih pas? Yuk ngobrol dengan admin di WhatsApp! 🪄'
   },
   {
-    keywords: ['lokasi', 'alamat', 'tempat', 'dimana'],
-    reply: 'Kami siap meluncur langsung ke lokasi acara Anda! Tim SnapHub meng-cover berbagai area. Untuk detail biaya transport (jika ada), silakan hubungi admin kami. 🚗💨'
+    keywords: ['lokasi', 'alamat', 'tempat', 'dimana', 'luar kota', 'area', 'cover'],
+    reply: 'Kami siap meluncur langsung ke lokasi acara Anda! Tim SnapHub meng-cover berbagai area (termasuk gratis transport untuk area Malang Kota). Untuk detail acara luar kota dan biayanya, silakan hubungi admin kami. 🚗💨'
+  },
+  {
+    keywords: ['admin', 'manusia', 'ngobrol', 'berbicara', 'hubungi'],
+    reply: 'Ingin berdiskusi lebih detail atau ada pertanyaan khusus? Jangan ragu untuk ngobrol langsung dengan tim admin kami! Silakan klik tombol "Chat via WhatsApp" berwarna hijau di bawah ya. 😊💬'
   },
   {
     keywords: ['cara pesan', 'cara booking', 'order', 'pesan', 'alur'],
@@ -267,7 +271,7 @@ const BotAssistant = () => {
             </div>
 
             {/* Quick Replies */}
-            <div className="px-4 py-3 bg-[#0B0B0B] flex flex-wrap gap-2 border-t border-white/5">
+            <div className="px-4 py-3 bg-[#0B0B0B] flex gap-2 border-t border-white/5 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {quickReplies.map((qr, idx) => (
                 <button
                   key={idx}

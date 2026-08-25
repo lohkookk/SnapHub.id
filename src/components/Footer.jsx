@@ -69,7 +69,7 @@ const Footer = () => {
             initial={{ opacity: 0, scale: 0.5, y: 25 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.5, y: 20 }}
-            className="fixed bottom-24 right-6 md:bottom-[10rem] md:right-8 z-[100]"
+            className="fixed bottom-37 right-5 md:bottom-[10rem] md:right-8 z-[100]"
           >
             <motion.button
               animate={{ y: [0, -6, 0] }}
